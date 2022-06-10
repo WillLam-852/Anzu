@@ -23,6 +23,4 @@ const pageSchema = new Schema({
     section: [sectionSchema]
 })
 
-mongoose.model('contents', contentSchema)
-mongoose.model('sections', sectionSchema)
 mongoose.model('pages', pageSchema)

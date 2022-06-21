@@ -12,18 +12,34 @@ module.exports = (app) => {
         res.send({ success: new_page === page })
     })
 
-    app.get('/api/new_card', async (req, res) => {
-        const page = req.query.page
+    app.get('/api/cards', async (req, res) => {
+        try {
+            const page = await Models.Page.find({
+                title: req.query.title
+            })
+            res.send(page)
+        } catch (err) {
+            res.send({ success: false, error: err })
+        }
+    })
+
+    app.get('/api/new_card', (req, res) => {
         const card = new Models.Card({ 
             title: req.query.title,
             order: req.query.order,
             image: null, 
             description: req.query.description });
-        // const new_page = Models.Page.findOneAndUpdate(
-        //     { title: req.query.page },
-        //     { card: }
-        // )
-        res.send({ save: true })
+        Models.Page.findOneAndUpdate(
+            { title: req.query.page },
+            { $push: { cards: card } },
+            function(err, _) {
+                if (err) {
+                    res.send({ success: false, error: err })
+                } else {
+                    res.send({ success: true })
+                }
+            }
+        )
     })
 
 }

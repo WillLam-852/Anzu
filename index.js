@@ -15,7 +15,7 @@ mongoose.connect(keys.mongoURI, {}, err => {
 
 const app = express()
 
-const model = require('./models/Model')
+require('./models/Models')
 require('./routes/routes')(app)
 
 

@@ -1,26 +1,27 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-const contentSchema = new Schema({
-    text: String,
+const cardSchema = new Schema({
+    title: String,
+    order: Number,
     image: {
         data: Buffer,
         contentType: String
     },
-})
-
-const sectionSchema = new Schema({
-    name: String,
-    content: [contentSchema]
+    description: String
 })
 
 const pageSchema = new Schema({
     title: String,
+    order: Number,
     badge_image: {
         data: Buffer,
         contentType: String
     },
-    section: [sectionSchema]
+    cards: [cardSchema]
 })
 
-mongoose.model('pages', pageSchema)
+module.exports = {
+    Card: mongoose.model('Card', cardSchema),
+    Page: mongoose.model('Page', pageSchema)
+}

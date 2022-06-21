@@ -2,7 +2,7 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 
 module.exports = (app) => {
   app.use(
-    ["/Tea_ceremony", "/Ikebana", "/Wagashi", "/Yukata"],
+    ["/api/save"],
     createProxyMiddleware({
       target: "http://localhost:5001",
     })

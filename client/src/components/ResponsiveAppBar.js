@@ -11,9 +11,7 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { Link } from 'react-router-dom';
 
-const pages = ['茶道', '華道', '和菓子ワークショップ', '浴衣レンタル', 'Coming Soon'];
-
-const ResponsiveAppBar = ({ isEdit=false }) => {
+const ResponsiveAppBar = ({ isEdit=false, titles }) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
 
   const handleOpenNavMenu = (event) => {
@@ -29,20 +27,7 @@ const ResponsiveAppBar = ({ isEdit=false }) => {
     if (isEdit) {
       url_prefix = "edit"
     }
-    switch (page) {
-      case '茶道':
-        return `${url_prefix}/TeaCeremony`
-      case '華道':
-        return `${url_prefix}/Ikebana`
-      case '和菓子ワークショップ':
-        return `${url_prefix}/Wagashi`
-      case '浴衣レンタル':
-        return `${url_prefix}/Yukata`
-      case 'Coming Soon':
-        return `${url_prefix}/ComingSoon`        
-      default:
-        return `${url_prefix}/`
-    }
+    return `${url_prefix}/${page}`
   }
 
   return (
@@ -98,7 +83,7 @@ const ResponsiveAppBar = ({ isEdit=false }) => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              {pages.map((page) => (
+              {titles.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">
                     <Link style={{ textDecoration: "none", color: "black" }} to={loadRoute(page)}>
@@ -130,7 +115,7 @@ const ResponsiveAppBar = ({ isEdit=false }) => {
             ANZU
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
+            {titles.map((page) => (
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}

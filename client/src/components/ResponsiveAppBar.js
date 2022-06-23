@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { Link } from 'react-router-dom';
 
-const ResponsiveAppBar = ({ isEdit=false, titles }) => {
+const ResponsiveAppBar = ({ titles, edit_mode=false }) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
 
   const handleOpenNavMenu = (event) => {
@@ -21,14 +21,6 @@ const ResponsiveAppBar = ({ isEdit=false, titles }) => {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
-
-  const loadRoute = (page) => {
-    let url_prefix = ""
-    if (isEdit) {
-      url_prefix = "edit"
-    }
-    return `${url_prefix}/${page}`
-  }
 
   return (
     <AppBar position="static" sx={{ m: -1, mb: 5, width: '103.5%' }}>
@@ -40,7 +32,7 @@ const ResponsiveAppBar = ({ isEdit=false, titles }) => {
             variant="h6"
             noWrap
             component="a"
-            href="/"
+            href={edit_mode ? "/Edit/" : "/"}
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -83,11 +75,11 @@ const ResponsiveAppBar = ({ isEdit=false, titles }) => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              {titles.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+              {titles.map((title) => (
+                <MenuItem key={title} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">
-                    <Link style={{ textDecoration: "none", color: "black" }} to={loadRoute(page)}>
-                      {page}
+                    <Link style={{ textDecoration: "none", color: "black" }} to={title}>
+                      {title}
                     </Link>
                   </Typography>
                 </MenuItem>
@@ -100,7 +92,7 @@ const ResponsiveAppBar = ({ isEdit=false, titles }) => {
             variant="h5"
             noWrap
             component="a"
-            href="/"
+            href={edit_mode ? "/Edit/" : "/"}
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
@@ -115,14 +107,14 @@ const ResponsiveAppBar = ({ isEdit=false, titles }) => {
             ANZU
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {titles.map((page) => (
+            {titles.map((title) => (
               <Button
-                key={page}
+                key={title}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                <Link style={{ textDecoration: "none", color: "white" }} to={loadRoute(page)}>
-                  {page}
+                <Link style={{ textDecoration: "none", color: "white" }} to={title}>
+                  {title}
                 </Link>
               </Button>
             ))}

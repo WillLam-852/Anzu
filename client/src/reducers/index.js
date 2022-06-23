@@ -2,7 +2,8 @@ import authReducer from "./authReducer"
 
 const combineReducers = {
     reducer: {
-        auth: authReducer
+        auth: authReducer,
+        page: pageReducer
     }
 }
 

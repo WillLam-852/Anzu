@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { savePages } from '../reducers/pagesReducer'
 import http from '../http-common'
 import Page from '../pages/Page'
 import Home from '../pages/Home'
@@ -7,7 +9,8 @@ import Test from '../pages/Test'
 
 const App = () => {
     const [titles, setTitles] = useState([])
-    const [pages, setPages] = useState([])
+
+    const dispatch = useDispatch()
 
     useEffect (() => {
       const fetchPages = async () => {
@@ -25,23 +28,19 @@ const App = () => {
             titles_fetched.push(data.title)
         })
         setTitles(titles_fetched)
-        setPages(pages_fetched)
+        dispatch(savePages({ 
+            pages: pages_fetched,
+            titles: titles_fetched
+        }))
       }
       fetchPages()
     }, [])
 
-    const get_routes = (titles, pages) => {
+    const get_routes = (titles) => {
         var rows = []
         titles.forEach( title => {
-            rows.push(<Route exact path={`/${title}`} render={() => Page({ titles, title, page: pages.find(obj => {return obj.title === title})})} key={title}/>)
-        })
-        return rows
-    }
-
-    const get_edit_routes = (titles, pages) => {
-        var rows = []
-        titles.forEach( title => {
-            rows.push(<Route exact path={`/Edit/${title}`} render={() => Page({ titles, title, page: pages.find(obj => {return obj.title === title}), edit_mode: true })} key={title}/>)
+            rows.push(<Route exact path={`/${title}`} component={Page} key={title}/>)
+            rows.push(<Route exact path={`/Edit/${title}`} component={Page} key={title}/>)
         })
         return rows
     }
@@ -52,10 +51,9 @@ const App = () => {
                 <div>
                     <Switch>
                         <Route exact path="/Test/" component={Test} />
-                        <Route exact path="/" render={() => Home({ titles })} />
-                        {get_routes(titles, pages)}
-                        <Route exact path="/Edit/" render={() => Home({ titles, edit_mode: true })} />
-                        {get_edit_routes(titles, pages)}
+                        <Route exact path="/" component={Home} />
+                        <Route exact path="/Edit/" component={Home} />
+                        {get_routes(titles)}
                     </Switch>
                 </div>
             </BrowserRouter>

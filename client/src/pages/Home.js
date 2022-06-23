@@ -1,42 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 import { Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
 import { styled } from '@mui/material/styles'
-import { GoogleMap, useJsApiLoader } from '@react-google-maps/api'
 import ResponsiveAppBar from '../components/ResponsiveAppBar'
 
-const Home = ({ titles, edit_mode = false }) => {
+const Home = () => {
+    const [titles, setTitles] = useState([])
+    const [editMode, setEditMode] = useState(false)
+    const pages = useSelector((state) => state.pages)
+    const location = useLocation()
 
-    const containerStyle = {
-        width: '400px',
-        height: '400px'
-      };
-      
-      const center = {
-        lat: -3.745,
-        lng: -38.523
-      };
+    useEffect(() => {
+        if (location.pathname.slice(1, 5) === 'Edit') {
+            setEditMode(true)
+        }
+        setTitles(pages.titles)
+    }, [pages, location.pathname])
 
-    //   const { isLoaded } = useJsApiLoader({
-    //     id: 'google-map-script',
-    //     googleMapsApiKey: "YOUR_API_KEY"
-    //   })
-    
-    //   const [map, setMap] = useState(null)
-    
-    //   const onLoad = React.useCallback(function callback(map) {
-    //     const bounds = new window.google.maps.LatLngBounds(center);
-    //     map.fitBounds(bounds);
-    //     setMap(map)
-    //   }, [])
-    
-    //   const onUnmount = React.useCallback(function callback(map) {
-    //     setMap(null)
-    //   }, [])
-
-
-      
     const ImageButton = styled(ButtonBase)(({ theme }) => ({
         position: 'relative',
         height: 200,
@@ -103,7 +86,7 @@ const Home = ({ titles, edit_mode = false }) => {
 
     return (
         <Box>
-            <ResponsiveAppBar titles={titles} edit_mode={edit_mode} />
+            <ResponsiveAppBar titles={titles} edit_mode={editMode} />
             <Box sx={{ pb: 3 }}>
                 <Typography variant='h3'>Banner Image</Typography>
             </Box>
@@ -150,6 +133,9 @@ const Home = ({ titles, edit_mode = false }) => {
                 <Typography variant='h6'>上環德輔道中287-291長達大廈1605室</Typography>
                 <Typography variant='h6'>email: anzuhk@yahoo.com</Typography>
                 <Typography variant='h6'>WhatsApp to 44459808</Typography>
+            </Box>
+            <Box>
+                Map Image
             </Box>
         </Box>
     )

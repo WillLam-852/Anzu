@@ -20,6 +20,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
     const [warning, setWarning] = useState(undefined)
 
     useEffect(() => {
+        console.log("card_data: ", card_data)
         setCard(card_data)
     }, [card_data]) 
 
@@ -54,31 +55,22 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                 setWarning(`更改資料失敗 ${err}`)
             }
         } else {
-            // const new_card = {
-            //     order: 4,
-            //     title: editingTitle,
-            //     image: currentImageFile,
-            //     description: editingDescription,
-            //     page_id: card.page_id
-            // }
-            console.log('currentImageFile:', currentImageFile)
-            let formData = new FormData()
-            formData.append("file", currentImageFile)
+            const new_card = {
+                order: 4,
+                title: editingTitle,
+                image: currentImageFile,
+                description: editingDescription,
+                page_id: card.page_id
+            }
             try {
-                // const res = await http.post("/new_card", new_card)
-                // if (res.data.success) {
-                //     setCard(new_card)
-                //     setWarning(undefined)
-                //     setIsEdit(false)
-                // } else {
-                //     setWarning(`新增資料失敗 ${res.data.error}`)
-                // }
-                const res_img = await http.post("/upload_image", formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    }
-                })
-                console.log('res_img:', res_img)
+                const res = await http.post("/new_card", new_card)
+                if (res.data.success) {
+                    setCard(new_card)
+                    setWarning(undefined)
+                    setIsEdit(false)
+                } else {
+                    setWarning(`新增資料失敗 ${res.data.error}`)
+                }
             } catch (err) {
                 setWarning(`新增資料失敗 ${err}`)
             }
@@ -123,7 +115,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                     )}
                     <Stack sx={{ pb: 1 }} spacing={2} direction="row">
                         <label htmlFor="contained-button-file">
-                            <form action="/api/upload_image" method="post" enctype="multipart/form-data">
+                            <form action="/api/upload_image" method="post" encType="multipart/form-data">
                                 <Input accept="image/*" id="contained-button-file" type="file" name='image' onChange={select_image} />
                             </form>
                             <Box>

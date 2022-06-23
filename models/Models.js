@@ -18,6 +18,10 @@ const pageSchema = new Schema({
         data: Buffer,
         contentType: String
     },
+    button_image: {
+        data: Buffer,
+        contentType: String
+    },
     cards: [cardSchema]
 })
 

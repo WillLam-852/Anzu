@@ -33,7 +33,11 @@ const Page = () => {
                 description: card.description,
                 page_id: currentPage._id
             }
-            rows.push(<Card card_data={card_data} key={card._id}/>)
+            rows.push(
+                <Box maxWidth={700}>
+                    <Card card_data={card_data} edit_mode={editMode? "編輯" : undefined} key={card._id}/>
+                </Box>
+            )
         })
         return rows
     }
@@ -49,7 +53,9 @@ const Page = () => {
             </Box>
             {currentPage ? get_cards(currentPage.cards) : null}
             {currentPage && editMode ? 
-                <Card card_data={{ page_id: currentPage._id }} edit_mode="新增"/>
+                <Box maxWidth={700}>
+                    <Card card_data={{ page_id: currentPage._id }} edit_mode="新增"/>
+                </Box>
                 :
                 null
             }

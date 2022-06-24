@@ -5,12 +5,13 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import { styled } from '@mui/material/styles'
 import http from '../http-common'
+import AlertDialog from './AlertDialog'
 
 const Input = styled('input')({
     display: 'none',
 })
 
-const Card = ({ card_data, edit_mode=undefined }) => {
+const Card = ({ card_data, style, edit_mode=undefined }) => {
     const [isEdit, setIsEdit] = useState(false)
     const [editingTitle, setEditingTitle] = useState(undefined)
     const [editingDescription, setEditingDescription] = useState(undefined)
@@ -62,6 +63,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                 description: editingDescription,
                 page_id: card.page_id
             }
+            console.log("new_card:", new_card)
             try {
                 const res = await http.post("/new_card", new_card)
                 if (res.data.success) {
@@ -80,6 +82,24 @@ const Card = ({ card_data, edit_mode=undefined }) => {
     const handleCancelAction = () => {
         setIsEdit(false)
     }
+
+    const handleDeleteAction = async () => {
+        try {
+            const res = await http.post("/delete_card", { 
+                page_id: card.page_id,  
+                _id: card._id
+            })
+            if (res.data.success) {
+                setCard({ page_id: card.page_id })
+                setWarning(undefined)
+                setIsEdit(false)
+            } else {
+                setWarning(`新增資料失敗 ${res.data.error}`)
+            }
+        } catch (err) {
+            setWarning(`新增資料失敗 ${err}`)
+        }
+}
 
     // const upload = (file) => {
     //     let formData = new FormData()
@@ -139,7 +159,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                 </Box>
                 <Box sx={{ pt: 1.5 }}>
                     <TextField
-                        style={{width: 400, flex: 1}}
+                        style={{ width: 700, flex: 1 }}
                         label="文字 (可留空)"
                         multiline
                         rows={4}
@@ -150,6 +170,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                 </Box>
                 <Button sx={styles.button} variant="contained" onClick={handleConfirmAction}>確定</Button>
                 <Button sx={styles.button} variant="outlined" onClick={handleCancelAction}>取消</Button>
+                <AlertDialog sx={styles.button} variant="contained" color="warning" onClick={handleDeleteAction}/>
                 {warning ? 
                     <Box>
                         <Typography variant='h7' color='red'>{warning}</Typography>
@@ -161,7 +182,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
         :
             <Box sx={styles.box}>
                 <Stack sx={{ pb: 1 }} spacing={2} direction="row">
-                    {card?
+                    {card && card.title?
                         <Typography variant="h5">
                             {card.title}
                         </Typography>
@@ -175,7 +196,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                     }
                 </Stack>
                 <Box>
-                    {card?
+                    {card && card.image?
                         <img 
                             style={styles.img} 
                             src={card.image}
@@ -183,7 +204,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                         :
                         null
                     }
-                    {card?
+                    {card && card.description?
                         <Box>
                             {card.description}
                         </Box>

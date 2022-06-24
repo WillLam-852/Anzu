@@ -34,13 +34,13 @@ const App = () => {
         }))
       }
       fetchPages()
-    }, [])
+    }, [dispatch])
 
     const get_routes = (titles) => {
         var rows = []
         titles.forEach( title => {
             rows.push(<Route exact path={`/${title}`} component={Page} key={title}/>)
-            rows.push(<Route exact path={`/Edit/${title}`} component={Page} key={title}/>)
+            rows.push(<Route exact path={`/Edit/${title}`} component={Page} key={`Edit/${title}`}/>)
         })
         return rows
     }

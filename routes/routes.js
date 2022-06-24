@@ -156,7 +156,6 @@ module.exports = (app) => {
             )
             res.send({ success: true })
         } catch (err) {
-            console.log('er', err)
             res.send({ success: false, error: err })
         }
     })

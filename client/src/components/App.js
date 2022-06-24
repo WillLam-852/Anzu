@@ -13,8 +13,11 @@ const App = () => {
     const dispatch = useDispatch()
 
     useEffect (() => {
+      console.log('useEffec')
       const fetchPages = async () => {
+        console.log('fetchPages')
         const res = await http.get('/all_pages')
+        console.log('res')
         const pages_fetched = []
         const titles_fetched = []
         res.data.forEach( page => {
@@ -38,6 +41,7 @@ const App = () => {
     }, [dispatch])
 
     const get_routes = (titles) => {
+        console.log('get_routes:', titles)
         var rows = []
         titles.forEach( title => {
             rows.push(<Route exact path={`/${title}`} component={Page} key={title}/>)
@@ -48,20 +52,17 @@ const App = () => {
 
     return (
         <div>
-            Hello World
+            <BrowserRouter>
+                <div>
+                    <Switch>
+                        <Route exact path="/" component={Home} />
+                        <Route exact path="/Edit/" component={Home} />
+                        <Route exact path="/Edit/New_page/" component={NewPage} />
+                        {get_routes(titles)}
+                    </Switch>
+                </div>
+            </BrowserRouter>
         </div>
-        // <div>
-        //     <BrowserRouter>
-        //         <div>
-        //             <Switch>
-        //                 <Route exact path="/" component={Home} />
-        //                 <Route exact path="/Edit/" component={Home} />
-        //                 <Route exact path="/Edit/New_page/" component={NewPage} />
-        //                 {get_routes(titles)}
-        //             </Switch>
-        //         </div>
-        //     </BrowserRouter>
-        // </div>
     )
 }
 

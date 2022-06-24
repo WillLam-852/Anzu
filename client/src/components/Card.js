@@ -21,7 +21,6 @@ const Card = ({ card_data, style, edit_mode=undefined }) => {
     const [warning, setWarning] = useState(undefined)
 
     useEffect(() => {
-        console.log("card_data: ", card_data)
         setCard(card_data)
     }, [card_data]) 
 
@@ -63,7 +62,6 @@ const Card = ({ card_data, style, edit_mode=undefined }) => {
                 description: editingDescription,
                 page_id: card.page_id
             }
-            console.log("new_card:", new_card)
             try {
                 const res = await http.post("/new_card", new_card)
                 if (res.data.success) {
@@ -99,19 +97,7 @@ const Card = ({ card_data, style, edit_mode=undefined }) => {
         } catch (err) {
             setWarning(`新增資料失敗 ${err}`)
         }
-}
-
-    // const upload = (file) => {
-    //     let formData = new FormData()
-    //     formData.append("file", file);
-    //     return http.post("/upload_image", formData, {
-    //         headers: {
-    //             "Content-Type": "multipart/form-data",
-    //         }
-    //     })
-    // }
-
-    // const get_image = () => http.get("/get_image")
+    }
 
     const select_image = (e) => {
         setCurrentImageFile(e.target.files[0])
@@ -121,63 +107,63 @@ const Card = ({ card_data, style, edit_mode=undefined }) => {
     return (
         isEdit ? 
             <Box sx={styles.box}>
-                <Box sx={{ pb: 1.5 }}>
-                    <TextField 
-                        label="標題" 
-                        value={editingTitle}
-                        onChange={(e) => setEditingTitle(e.target.value)}
-                        variant="outlined" 
-                    />
-                </Box>
-                <Box sx={{ pb: 1.5 }}>
-                    {previewImage && (
-                        <img src={previewImage} alt="" />
-                    )}
-                    <Stack sx={{ pb: 1 }} spacing={2} direction="row">
-                        <label htmlFor="contained-button-file">
-                            <form action="/api/upload_image" method="post" encType="multipart/form-data">
-                                <Input accept="image/*" id="contained-button-file" type="file" name='image' onChange={select_image} />
-                            </form>
-                            <Box>
-                                <Button variant="contained" component="span">
-                                    {previewImage ? "更改照片" : "選擇照片"}
-                                </Button>
-                            </Box>
-                        </label>
-                        {previewImage ?
-                            <Box>
-                                <Button variant="outlined" component="span" onClick={() => {
-                                    setCurrentImageFile(undefined)
-                                    setPreviewImage(undefined)
-                                }}>
-                                    刪除照片
-                                </Button>
-                            </Box>
-                        :
-                        null}
-                    </Stack>
-                </Box>
-                <Box sx={{ pt: 1.5 }}>
-                    <TextField
-                        style={{ width: 700, flex: 1 }}
-                        label="文字 (可留空)"
-                        multiline
-                        rows={4}
-                        value={editingDescription}
-                        onChange={(e) => setEditingDescription(e.target.value)}
-                        variant="outlined"
-                    />
-                </Box>
-                <Button sx={styles.button} variant="contained" onClick={handleConfirmAction}>確定</Button>
-                <Button sx={styles.button} variant="outlined" onClick={handleCancelAction}>取消</Button>
-                <AlertDialog sx={styles.button} variant="contained" color="warning" onClick={handleDeleteAction}/>
-                {warning ? 
-                    <Box>
-                        <Typography variant='h7' color='red'>{warning}</Typography>
+                <form action="/api/upload_image" method="post" encType="multipart/form-data">
+                    <Box sx={{ pb: 1.5 }}>
+                        <TextField 
+                            label="標題" 
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            variant="outlined" 
+                        />
                     </Box>
-                :
-                    null
-                }
+                    <Box sx={{ pb: 1.5 }}>
+                        {previewImage && (
+                            <img src={previewImage} alt="" />
+                        )}
+                        <Stack sx={{ pb: 1 }} spacing={2} direction="row">
+                            <label htmlFor="image">
+                                <Input accept="image/*" id="image" type="file" name='image' onChange={select_image} />
+                                <Box>
+                                    <Button variant="contained" component="span">
+                                        {previewImage ? "更改照片" : "選擇照片"}
+                                    </Button>
+                                </Box>
+                            </label>
+                            {previewImage ?
+                                <Box>
+                                    <Button variant="outlined" component="span" onClick={() => {
+                                        setCurrentImageFile(undefined)
+                                        setPreviewImage(undefined)
+                                    }}>
+                                        刪除照片
+                                    </Button>
+                                </Box>
+                            :
+                            null}
+                        </Stack>
+                    </Box>
+                    <Box sx={{ pt: 1.5 }}>
+                        <TextField
+                            style={{ width: 700, flex: 1 }}
+                            label="文字 (可留空)"
+                            multiline
+                            rows={4}
+                            value={editingDescription}
+                            onChange={(e) => setEditingDescription(e.target.value)}
+                            variant="outlined"
+                        />
+                    </Box>
+                    <Button type="submit" sx={styles.button} variant="contained" onClick={handleConfirmAction}>確定</Button>
+                    <Button sx={styles.button} variant="outlined" onClick={handleCancelAction}>取消</Button>
+                    <AlertDialog sx={styles.button} variant="contained" color="warning" onClick={handleDeleteAction}/>
+                    {warning ? 
+                        <Box>
+                            <Typography variant='h7' color='red'>{warning}</Typography>
+                        </Box>
+                    :
+                        null
+                    }
+                </form>
             </Box>
         :
             <Box sx={styles.box}>

@@ -1,31 +1,31 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-const cardSchema = new Schema({
+const imageSchema = new mongoose.Schema({
     title: String,
-    order: Number,
-    image: {
+    img:
+    {
         data: Buffer,
         contentType: String
-    },
+    }
+});
+
+const cardSchema = new Schema({
+    page_id: String,
+    title: String,
+    image: imageSchema,
     description: String
 })
 
 const pageSchema = new Schema({
     title: String,
-    order: Number,
-    badge_image: {
-        data: Buffer,
-        contentType: String
-    },
-    button_image: {
-        data: Buffer,
-        contentType: String
-    },
+    banner_image: imageSchema,
+    button_image: imageSchema,
     cards: [cardSchema]
 })
 
 module.exports = {
     Card: mongoose.model('Card', cardSchema),
-    Page: mongoose.model('Page', pageSchema)
+    Page: mongoose.model('Page', pageSchema),
+    Image: mongoose.model('Image', imageSchema)
 }

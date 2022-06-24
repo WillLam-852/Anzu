@@ -2,10 +2,7 @@ const bodyParser = require('body-parser')
 const fs = require('fs')
 const path = require('path')
 const Models = require('../models/Models')
-// const upload_image = require('../utils/multerStorage')
-const ImageModel = require('../models/imageModel')
-const multer  = require('multer')
-const upload = multer({ dest: 'uploads/' })
+const upload_image = require('../utils/multerStorage')
 
 module.exports = (app) => {
 
@@ -48,14 +45,33 @@ module.exports = (app) => {
     app.post('/api/new_page', jsonParser, async (req, res) => {
         const page = new Models.Page({ 
             title: req.body.title,
-            order: req.body.order,
-            badge_image: null, 
+            banner_image: null,
+            button_image: null,
             cards: [] 
         })
         const new_page = await page.save()
-        res.send({ success: new_page === page })
+        console.log('new_page._id:', new_page._id)
+        res.send({ success: new_page === page, page_id: new_page._id })
     })
 
+    app.post('/api/upload_button_image/', upload_image.single('image'), async (req, res, next) => {
+        var obj = {
+            img: {
+                data: fs.readFileSync(path.join(__dirname, '../uploads/', req.file.filename)),
+                contentType: 'image/png'
+            }
+        }
+        try {
+            await Models.Page.findByIdAndUpdate(
+                req.body.page_id,
+                { button_image: obj }
+            )
+            res.send({ success: true })
+        } catch (err) {
+            res.send({ success: false, error: err })
+        }
+    })
+    
     // Ok
     app.post('/api/delete_page', jsonParser, async (req, res) => {
         try {
@@ -75,29 +91,12 @@ module.exports = (app) => {
                     { title: req.body.title }
                 )
             }
-            if (req.body.order != undefined) {
-                await Models.Page.findByIdAndUpdate(
-                    req.body._id,
-                    { order: req.body.order }
-                )
-            }
-            res.send({ success: true })
-        } catch (err) {
-            res.send({ success: false, error: err })
-        }
-    })
-
-    // TODO: Edit Badge Image
-
-    // Ok
-    app.post('/api/edit_order', jsonParser, async (req, res) => {
-        try {
-            if (req.body.order != undefined) {
-                await Models.Page.findByIdAndUpdate(
-                    req.body._id,
-                    { order: req.body.order }
-                )
-            }
+            // if (req.body.order != undefined) {
+            //     await Models.Page.findByIdAndUpdate(
+            //         req.body._id,
+            //         { order: req.body.order }
+            //     )
+            // }
             res.send({ success: true })
         } catch (err) {
             res.send({ success: false, error: err })
@@ -160,26 +159,40 @@ module.exports = (app) => {
         }
     })
 
-    // upload image
-    app.post('/api/upload_image', upload.single('profileImg'), async (req, res, next) => {
-        const url = req.protocol + '://' + req.get('host')
-        const obj = {
+
+    app.get('/api/get_images', (req, res) => {
+        Models.Image.find({}, (err, images) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send('An error occurred', err);
+            } else {
+                res.send({ images: images });
+            }
+        });
+    });
+    
+
+    app.post('/api/upload_image/', upload_image.single('image'), (req, res, next) => {
+        console.log('/api/upload_image/ ')
+        var obj = {
+            name: req.body.name,
+            desc: req.body.desc,
             img: {
-                data: url + '/uploads/' + req.file.filename,
+                data: fs.readFileSync(path.join(__dirname, '../uploads/', req.file.filename)),
                 contentType: 'image/png'
             }
         }
-        const newImage = new ImageModel({
-            image: obj.img
-        })
-        newImage.save((err) => {
-            err ? console.log('image err', err) : res.redirect("/")
-        })
-    })
-
-    // get image
-    app.get('/api/get_image')
-
+        Models.Image.create(obj, (err, item) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                // item.save();
+                // res.redirect('/');
+            }
+        });
+    });
+    
 
     // edit card
 

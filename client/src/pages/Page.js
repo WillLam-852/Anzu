@@ -5,8 +5,11 @@ import Box from '@mui/material/Box'
 import ResponsiveAppBar from '../components/ResponsiveAppBar'
 import Card from '../components/Card'
 import { useLocation } from 'react-router-dom'
+import { Buffer } from 'buffer'
+import http from '../http-common'
 
 const Page = () => {
+    const [images, setImages] = useState([])
     const [titles, setTitles] = useState([])
     const [currentPage, setCurrentPage] = useState(undefined)
     const [editMode, setEditMode] = useState(false)
@@ -22,6 +25,15 @@ const Page = () => {
         setTitles(pages.titles)
         setCurrentPage(pages.pages.find( element => element.title === path_title))
     }, [pages, location.pathname])
+
+    useEffect(() => {
+        const get_images = async () => {
+            const res = await http.get("/get_images")
+            console.log(res.data.images)
+            setImages(res.data.images)
+        }
+        get_images()
+    }, [])
     
     const get_cards = (cards) => {
         var rows = []
@@ -37,6 +49,16 @@ const Page = () => {
                 <Box maxWidth={700}>
                     <Card card_data={card_data} edit_mode={editMode? "編輯" : undefined} key={card._id}/>
                 </Box>
+            )
+        })
+        return rows
+    }
+
+    const get_images = (images) => {
+        var rows = []
+        images.forEach( image => {
+            rows.push(
+                <img src={`data:${image.img.contentType};base64,${Buffer.from(image.img.data, 'binary').toString('base64')}`} alt=''/>
             )
         })
         return rows
@@ -59,6 +81,12 @@ const Page = () => {
                 :
                 null
             }
+            <h1>Uploaded Images</h1>
+            <div>
+                {
+                    get_images(images)
+                }
+            </div>
         </Box>
     )
 }

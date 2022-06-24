@@ -78,7 +78,7 @@ const ResponsiveAppBar = ({ titles, edit_mode=false }) => {
               {titles.map((title) => (
                 <MenuItem key={title} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">
-                    <Link style={{ textDecoration: "none", color: "black" }} to={title}>
+                    <Link style={{ textDecoration: "none", color: "black" }} to={edit_mode ? `/Edit/${title}` : title}>
                       {title}
                     </Link>
                   </Typography>
@@ -113,7 +113,7 @@ const ResponsiveAppBar = ({ titles, edit_mode=false }) => {
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                <Link style={{ textDecoration: "none", color: "white" }} to={title}>
+                <Link style={{ textDecoration: "none", color: "white" }} to={edit_mode ? `/Edit/${title}` : title}>
                   {title}
                 </Link>
               </Button>

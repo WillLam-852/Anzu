@@ -12,7 +12,6 @@ mongoose.connect(keys.mongoURI, {}, err => {
 const app = express()
 
 require('./models/Models')
-require('./models/imageModel')
 require('./routes/routes')(app)
 
 const PORT = process.env.PORT || 5001

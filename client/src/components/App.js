@@ -5,7 +5,7 @@ import { savePages } from '../reducers/pagesReducer'
 import http from '../http-common'
 import Page from '../pages/Page'
 import Home from '../pages/Home'
-import Test from '../pages/Test'
+import NewPage from '../pages/NewPage'
 
 const App = () => {
     const [titles, setTitles] = useState([])
@@ -21,7 +21,8 @@ const App = () => {
             let data = {
                 _id: page._id,
                 title: page.title,
-                order: page.order,
+                banner_image: page.banner_image,
+                button_image: page.button_image,
                 cards: page.cards
             }
             pages_fetched.push(data)
@@ -50,9 +51,9 @@ const App = () => {
             <BrowserRouter>
                 <div>
                     <Switch>
-                        <Route exact path="/Test/" component={Test} />
                         <Route exact path="/" component={Home} />
                         <Route exact path="/Edit/" component={Home} />
+                        <Route exact path="/Edit/New_page/" component={NewPage} />
                         {get_routes(titles)}
                     </Switch>
                 </div>

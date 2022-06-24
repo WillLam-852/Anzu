@@ -6,6 +6,8 @@ import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
 import { styled } from '@mui/material/styles'
 import ResponsiveAppBar from '../components/ResponsiveAppBar'
+import { Buffer } from 'buffer'
+
 
 const Home = () => {
     const [titles, setTitles] = useState([])
@@ -92,17 +94,17 @@ const Home = () => {
             </Box>
             <Box>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
-                    {titles.map((title) => (
+                    {pages && pages.pages.map((page) => (
                         <ImageButton
                             focusRipple
-                            href={title}
-                            key={title}
+                            href={page.title}
+                            key={page.title}
                             style={{
                                 width: '50%',
                                 minHeight: '200px'
                             }}
                         >
-                            {/* <ImageSrc style={{ backgroundImage: `url(${image.url})` }} /> */}
+                            <ImageSrc style={{ backgroundImage: `url(${`data:${page.button_image.img.contentType};base64,${Buffer.from(page.button_image.img.data, 'binary').toString('base64')}`})` }} />
                             <ImageBackdrop className="MuiImageBackdrop-root" />
                             <Image>
                                 <Typography
@@ -116,7 +118,7 @@ const Home = () => {
                                         pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
                                     }}
                                 >
-                                    {title}
+                                    {page.title}
                                     <ImageMarked className="MuiImageMarked-root" />
                                 </Typography>
                             </Image>

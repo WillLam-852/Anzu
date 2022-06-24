@@ -13,8 +13,8 @@ const imageSchema = new mongoose.Schema({
 const cardSchema = new Schema({
     page_id: String,
     title: String,
-    image: imageSchema,
-    description: String
+    description: String,
+    image: imageSchema
 })
 
 const pageSchema = new Schema({

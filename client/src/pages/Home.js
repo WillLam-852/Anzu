@@ -8,6 +8,14 @@ import { styled } from '@mui/material/styles'
 import ResponsiveAppBar from '../components/ResponsiveAppBar'
 import { Buffer } from 'buffer'
 
+const contact_us_text = `Anzu
+1605 Champion Bldg
+287-291 Des Voeux Road Central
+Sheung Wan
+上環德輔道中287-291長達大廈1605室
+email : anzuhk@yahoo.com
+WhatsApp to 44459808`
+
 
 const Home = () => {
     const [titles, setTitles] = useState([])
@@ -24,7 +32,7 @@ const Home = () => {
 
     const ImageButton = styled(ButtonBase)(({ theme }) => ({
         position: 'relative',
-        height: 200,
+        height: 350,
         [theme.breakpoints.down('sm')]: {
             width: '100% !important', // Overrides inline-style
             height: 100,
@@ -49,7 +57,9 @@ const Home = () => {
         right: 0,
         top: 0,
         bottom: 0,
-        backgroundSize: 'cover',
+        objectFit: 'contain',
+        justify: "center",
+        alignItems: "center",
         backgroundPosition: 'center 40%',
     });
 
@@ -72,7 +82,7 @@ const Home = () => {
         top: 0,
         bottom: 0,
         backgroundColor: theme.palette.common.black,
-        opacity: 0.4,
+        opacity: 0.2,
         transition: theme.transitions.create('opacity'),
     }));
 
@@ -109,7 +119,7 @@ const Home = () => {
                             <Image>
                                 <Typography
                                     component="span"
-                                    variant="subtitle1"
+                                    variant="h4"
                                     color="inherit"
                                     sx={{
                                         position: 'relative',
@@ -127,14 +137,12 @@ const Home = () => {
                 </Box>
             </Box>
             <Box sx={{ pt: 2 }}>
-                <Typography variant='h3'>Contact Us</Typography>
-                <Typography variant='h3'>Anzu</Typography>
-                <Typography variant='h6'>1605 Champion Bldg</Typography>
-                <Typography variant='h6'>287-291 Des Voeux Road Central</Typography>
-                <Typography variant='h6'>Sheung Wan</Typography>
-                <Typography variant='h6'>上環德輔道中287-291長達大廈1605室</Typography>
-                <Typography variant='h6'>email: anzuhk@yahoo.com</Typography>
-                <Typography variant='h6'>WhatsApp to 44459808</Typography>
+                <Typography variant='h4'>Contact Us</Typography>
+                <Typography paragraph>
+                    {contact_us_text.split("\n").map((i,key) => {
+                        return <div key={key}>{i}</div>;
+                    })}
+                </Typography>
             </Box>
             <Box>
                 Map Image

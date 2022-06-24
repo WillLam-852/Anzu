@@ -54,6 +54,7 @@ module.exports = (app) => {
         res.send({ success: new_page === page, page_id: new_page._id })
     })
 
+    // Ok
     app.post('/api/upload_button_image/', upload_image.single('image'), async (req, res, next) => {
         var obj = {
             img: {
@@ -65,6 +66,25 @@ module.exports = (app) => {
             await Models.Page.findByIdAndUpdate(
                 req.body.page_id,
                 { button_image: obj }
+            )
+            res.send({ success: true })
+        } catch (err) {
+            res.send({ success: false, error: err })
+        }
+    })
+
+    // Ok
+    app.post('/api/upload_banner_image/', upload_image.single('image'), async (req, res, next) => {
+        var obj = {
+            img: {
+                data: fs.readFileSync(path.join(__dirname, '../uploads/', req.file.filename)),
+                contentType: 'image/png'
+            }
+        }
+        try {
+            await Models.Page.findByIdAndUpdate(
+                req.body.page_id,
+                { banner_image: obj }
             )
             res.send({ success: true })
         } catch (err) {
@@ -107,8 +127,6 @@ module.exports = (app) => {
     app.post('/api/new_card', jsonParser, async (req, res) => {
         const card = new Models.Card({ 
             title: req.body.title,
-            order: req.body.order,
-            image: req.body.image, 
             description: req.body.description 
         })
         try {
@@ -117,11 +135,35 @@ module.exports = (app) => {
                 { $push: { cards: card } },
                 { new: true }
             )
-            if (page != null) {
-                res.send({ success: true, page: page })
+            const new_card = page.cards[page.cards.length - 1]
+            if (new_card) {
+                res.send({ success: true, card: new_card })
             } else {
                 res.send({ success: false, error: 'cannot find this page' })
             }
+        } catch (err) {
+            res.send({ success: false, error: err })
+        }
+    })
+
+    // Ok
+    app.post('/api/edit_card', jsonParser, async (req, res) => {
+        const card = { 
+            title: req.body.title,
+            description: req.body.description
+        }
+        console.log(req.body.description)
+        try {
+            await Models.Page.updateOne(
+                { "_id": req.body.page_id, "cards._id": req.body.card_id },
+                {
+                    $set: {
+                        "cards.$.title": card.title,
+                        "cards.$.description": card.description,
+                    }
+                }
+            )
+            res.send({ success: true })
         } catch (err) {
             res.send({ success: false, error: err })
         }
@@ -141,15 +183,21 @@ module.exports = (app) => {
     })
 
 
-    app.post('/api/edit_card', jsonParser, async (req, res) => {
+    app.post('/api/upload_card_image/', upload_image.single('image'), async (req, res, next) => {
+        var obj = {
+            img: {
+                data: fs.readFileSync(path.join(__dirname, '../uploads/', req.file.filename)),
+                contentType: 'image/png'
+            }
+        }
         try {
+            console.log(obj)
+            console.log(req.body.card_id)
             await Models.Page.updateOne(
-                { "cards._id": req.body._id },
+                { "_id": req.body.page_id, "cards._id": req.body.card_id },
                 {
                     $set: {
-                        "cards.$.title": req.body.title,
-                        "cards.$.order": req.body.order,
-                        "cards.$.description": req.body.description,
+                        "cards.$.image": obj,
                     }
                 }
             )
@@ -158,42 +206,4 @@ module.exports = (app) => {
             res.send({ success: false, error: err })
         }
     })
-
-
-    app.get('/api/get_images', (req, res) => {
-        Models.Image.find({}, (err, images) => {
-            if (err) {
-                console.log(err);
-                res.status(500).send('An error occurred', err);
-            } else {
-                res.send({ images: images });
-            }
-        });
-    });
-    
-
-    app.post('/api/upload_image/', upload_image.single('image'), (req, res, next) => {
-        console.log('/api/upload_image/ ')
-        var obj = {
-            name: req.body.name,
-            desc: req.body.desc,
-            img: {
-                data: fs.readFileSync(path.join(__dirname, '../uploads/', req.file.filename)),
-                contentType: 'image/png'
-            }
-        }
-        Models.Image.create(obj, (err, item) => {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                // item.save();
-                // res.redirect('/');
-            }
-        });
-    });
-    
-
-    // edit card
-
 }

@@ -48,17 +48,20 @@ const App = () => {
 
     return (
         <div>
-            <BrowserRouter>
-                <div>
-                    <Switch>
-                        <Route exact path="/" component={Home} />
-                        <Route exact path="/Edit/" component={Home} />
-                        <Route exact path="/Edit/New_page/" component={NewPage} />
-                        {get_routes(titles)}
-                    </Switch>
-                </div>
-            </BrowserRouter>
+            Hello World
         </div>
+        // <div>
+        //     <BrowserRouter>
+        //         <div>
+        //             <Switch>
+        //                 <Route exact path="/" component={Home} />
+        //                 <Route exact path="/Edit/" component={Home} />
+        //                 <Route exact path="/Edit/New_page/" component={NewPage} />
+        //                 {get_routes(titles)}
+        //             </Switch>
+        //         </div>
+        //     </BrowserRouter>
+        // </div>
     )
 }
 

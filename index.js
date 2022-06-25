@@ -12,7 +12,7 @@ mongoose.connect(keys.mongoURI, {}, err => {
 const app = express()
 
 require('./models/Models')
-require('./routes/Routes')(app)
+require('./routes/routes')(app)
 
 if (process.env.NODE_ENV === 'production') {
     // Express will serve up production assets

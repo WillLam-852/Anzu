@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Stack, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
-import ResponsiveAppBar from '../components/ResponsiveAppBar'
-import Card from '../components/Card'
-import { styled } from '@mui/material/styles'
-import { useLocation } from 'react-router-dom'
 import { Buffer } from 'buffer'
+import { styled } from '@mui/material/styles'
 import http from '../http-common'
+import AlertDialog from '../components/AlertDialog'
+import Card from '../components/Card'
+import ResponsiveAppBar from '../components/ResponsiveAppBar'
 
 const Input = styled('input')({
     display: 'none',
@@ -18,17 +20,20 @@ const Page = () => {
     const [titles, setTitles] = useState([])
     const [currentPage, setCurrentPage] = useState(undefined)
     const [editMode, setEditMode] = useState(false)
+    const [isEditTitle, setIsEditTitle] = useState(false)
+    const [editingTitle, setEditingTitle] = useState('')
     const [currentImageFile, setCurrentImageFile] = useState(undefined)
     const [previewImage, setPreviewImage] = useState(undefined)
     const [warning, setWarning] = useState(undefined)
     const location = useLocation()
+    const navigate = useNavigate()
 
     const pages = useSelector((state) => state.pages)
 
     useEffect(() => {
-        let path_title = location.pathname.slice(1)
+        let path_title = decodeURIComponent(location.pathname.slice(1))
         if (location.pathname.slice(1, 5) === 'Edit') {
-            path_title = location.pathname.slice(6)
+            path_title = decodeURIComponent(location.pathname.slice(6))
             setEditMode(true)
         }
         setTitles(pages.titles)
@@ -47,7 +52,7 @@ const Page = () => {
                 page_id: currentPage._id
             }
             rows.push(
-                <Box maxWidth={700}>
+                <Box maxWidth={700} key={card._id}>
                     <Card card_data={card_data} edit_mode={editMode? "編輯" : undefined} key={card._id}/>
                 </Box>
             )
@@ -58,6 +63,29 @@ const Page = () => {
     const select_image = (e) => {
         setCurrentImageFile(e.target.files[0])
         setPreviewImage(URL.createObjectURL(e.target.files[0]))
+    }
+
+    const handleEditTitleAction = () => {
+        setIsEditTitle(true)
+        setEditingTitle(currentPage.title)
+    }
+
+    const handleConfirmTitleAction = async () => {
+        const res = await http.post("/edit_title", {
+            page_id: currentPage._id,
+            title: editingTitle
+        })
+        if (res.data.success) {
+            setIsEditTitle(false)
+            navigate(`/Edit/${editingTitle}`)
+            window.location.reload(true)
+        } else {
+            setWarning(`更改頁面標題 ${res.data.error}`)
+        }
+    }
+
+    const handleCancelTitleAction = () => {
+        setIsEditTitle(false)
     }
 
     const handleUploadImageAction = async (e) => {
@@ -80,11 +108,47 @@ const Page = () => {
         }
     }
 
+    const handleDeletePageAction = async () => {
+        const res = await http.post("/delete_page", {
+            page_id: currentPage._id
+        })
+        if (res.data.success) {
+            navigate(`/Edit`)
+            window.location.reload(true)
+        } else {
+            setWarning(`刪除頁面失敗 ${res.data.error}`)
+        }
+    }
+
     return (
         <Box>
             <ResponsiveAppBar titles={titles} edit_mode={editMode} />
             <Box sx={{ pb: 3 }}>
-                <Typography variant='h3'>{currentPage ? currentPage.title : null}</Typography>
+                {isEditTitle ? 
+                    <Box>
+                        <TextField 
+                            label="頁面標題" 
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            variant="outlined" 
+                        />
+                        <Stack sx={{ pb: 1 }} spacing={2} direction="row">
+                            <Box> <Button sx={sxs.button} style={styles.button} variant="contained" onClick={handleConfirmTitleAction}>確定</Button> </Box>
+                            <Box> <Button sx={sxs.button} style={styles.button} variant="outlined" onClick={handleCancelTitleAction}>取消</Button> </Box>
+                        </Stack>
+                    </Box>
+                :
+                    <Stack sx={{ pb: 1 }} spacing={2} direction="row">
+                        <Typography variant='h3'>{currentPage ? currentPage.title : null}</Typography>
+                        {editMode ?
+                            <Button sx={sxs.button} style={styles.button} variant="outlined" onClick={handleEditTitleAction}>
+                                更改頁面標題
+                            </Button>
+                        :
+                            null
+                        }
+                    </Stack>
+                }
             </Box>
             <Box sx={{ pb: 3 }}>
                 {currentPage && currentPage.banner_image && !previewImage ?
@@ -136,8 +200,13 @@ const Page = () => {
             </Box>
             {currentPage ? get_cards(currentPage.cards) : null}
             {currentPage && editMode ? 
-                <Box maxWidth={700}>
-                    <Card card_data={{ page_id: currentPage._id }} edit_mode="新增"/>
+                <Box>
+                    <Box maxWidth={700}>
+                        <Card card_data={{ page_id: currentPage._id }} edit_mode="新增" />
+                    </Box>
+                    <Box>
+                        <AlertDialog title="刪除頁面" sx={styles.button} variant="contained" color="warning" onClick={handleDeletePageAction}/>
+                    </Box>
                 </Box>
                 :
                 null
@@ -151,6 +220,19 @@ const Page = () => {
             }
         </Box>
     )
+}
+
+const sxs = {
+    button: {
+        ml: 1,
+        my: 1
+    }
+}
+
+const styles = {
+    button: {
+        maxHeight: '40px'
+    }
 }
 
 export default Page

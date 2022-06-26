@@ -4,7 +4,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 
-const AlertDialog = ({ sx, variant, color, onClick }) => {
+const AlertDialog = ({ title, sx, variant, color, onClick }) => {
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -23,7 +23,7 @@ const AlertDialog = ({ sx, variant, color, onClick }) => {
   return (
     <>
       <Button sx={sx} variant={variant} color={color} onClick={handleClickOpen}>
-        刪除
+        {title}
       </Button>
       <Dialog
         open={open}
@@ -33,7 +33,7 @@ const AlertDialog = ({ sx, variant, color, onClick }) => {
         fullWidth={true}
       >
         <DialogTitle id="alert-dialog-title">
-          確定刪除?
+          確定{title}?
         </DialogTitle>
         <DialogActions>
           <Button variant='contained' color={color} onClick={handleConfirm}>確定</Button>

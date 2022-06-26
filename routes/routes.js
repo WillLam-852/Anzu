@@ -95,8 +95,12 @@ module.exports = (app) => {
     // Ok
     app.post('/api/delete_page', jsonParser, async (req, res) => {
         try {
-            await Models.Page.findByIdAndDelete(req.body._id)
-            res.send({ success: true })
+            const new_page = await Models.Page.findByIdAndDelete(req.body.page_id)
+            if (new_page) {
+                res.send({ success: true })
+            } else {
+                res.send({ success: false, error: '找不到這頁面' })
+            }
         } catch (err) {
             res.send({ success: false, error: err })
         }
@@ -106,18 +110,16 @@ module.exports = (app) => {
     app.post('/api/edit_title', jsonParser, async (req, res) => {
         try {
             if (req.body.title != undefined) {
-                await Models.Page.findByIdAndUpdate(
-                    req.body._id,
+                const new_page = await Models.Page.findByIdAndUpdate(
+                    req.body.page_id,
                     { title: req.body.title }
                 )
+                if (new_page) {
+                    res.send({ success: true })
+                } else {
+                    res.send({ success: true, error: 'Cannot find page by page_id' })
+                }
             }
-            // if (req.body.order != undefined) {
-            //     await Models.Page.findByIdAndUpdate(
-            //         req.body._id,
-            //         { order: req.body.order }
-            //     )
-            // }
-            res.send({ success: true })
         } catch (err) {
             res.send({ success: false, error: err })
         }

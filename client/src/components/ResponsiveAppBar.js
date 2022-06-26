@@ -78,12 +78,23 @@ const ResponsiveAppBar = ({ titles, edit_mode=false }) => {
               {titles.map((title) => (
                 <MenuItem key={title} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">
-                    <Link style={{ textDecoration: "none", color: "black" }} to={edit_mode ? `/Edit/${title}` : title}>
+                    <Link style={{ textDecoration: "none", color: "black" }} to={edit_mode ? `/Edit/${title}` : `/${title}`}>
                       {title}
                     </Link>
                   </Typography>
                 </MenuItem>
               ))}
+              {edit_mode ? 
+                <MenuItem key='新增頁面' onClick={handleCloseNavMenu}>
+                  <Typography textAlign="center">
+                    <Link style={{ textDecoration: "none", color: "black" }} to='/Edit/New_page'>
+                      新增頁面
+                    </Link>
+                  </Typography>
+                </MenuItem>
+              :
+                null
+              }
             </Menu>
           </Box>
 
@@ -113,11 +124,24 @@ const ResponsiveAppBar = ({ titles, edit_mode=false }) => {
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                <Link style={{ textDecoration: "none", color: "white" }} to={edit_mode ? `/Edit/${title}` : title}>
+                <Link style={{ textDecoration: "none", color: "white" }} to={edit_mode ? `/Edit/${title}` : `/${title}`}>
                   {title}
                 </Link>
               </Button>
             ))}
+            {edit_mode ? 
+              <Button
+                key='新增頁面'
+                onClick={handleCloseNavMenu}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                <Link style={{ textDecoration: "none", color: "white" }} to='/Edit/New_page'>
+                  新增頁面
+                </Link>
+              </Button>
+            :
+              null
+            }
           </Box>
 
         </Toolbar>

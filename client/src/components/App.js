@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { savePages } from '../reducers/pagesReducer'
 import http from '../http-common'
@@ -13,11 +13,8 @@ const App = () => {
     const dispatch = useDispatch()
 
     useEffect (() => {
-      console.log('useEffec')
       const fetchPages = async () => {
-        console.log('fetchPages')
         const res = await http.get('/all_pages')
-        console.log('res')
         const pages_fetched = []
         const titles_fetched = []
         res.data.forEach( page => {
@@ -41,28 +38,23 @@ const App = () => {
     }, [dispatch])
 
     const get_routes = (titles) => {
-        console.log('get_routes:', titles)
         var rows = []
         titles.forEach( title => {
-            rows.push(<Route exact path={`/${title}`} component={Page} key={title}/>)
-            rows.push(<Route exact path={`/Edit/${title}`} component={Page} key={`Edit/${title}`}/>)
+            rows.push(<Route path={`/${encodeURIComponent(title)}`} element={<Page />} key={title}/>)
+            rows.push(<Route path={`/Edit/${encodeURIComponent(title)}`} element={<Page />} key={`Edit/${title}`}/>)
         })
         return rows
     }
 
     return (
-        <div>
-            <BrowserRouter>
-                <div>
-                    <Switch>
-                        <Route exact path="/" component={Home} />
-                        <Route exact path="/Edit/" component={Home} />
-                        <Route exact path="/Edit/New_page/" component={NewPage} />
-                        {get_routes(titles)}
-                    </Switch>
-                </div>
-            </BrowserRouter>
-        </div>
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/Edit/" element={<Home />} />
+                <Route path="/Edit/New_page/" element={<NewPage />} />
+                {get_routes(titles)}
+            </Routes>
+        </BrowserRouter>
     )
 }
 

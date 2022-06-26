@@ -211,7 +211,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                     <Button sx={styles.button} variant="contained" onClick={handleConfirmAction}>確定</Button>
                     <Button sx={styles.button} variant="outlined" onClick={handleCancelAction}>取消</Button>
                     {!isNewCard?
-                        <AlertDialog sx={styles.button} variant="contained" color="warning" onClick={handleDeleteAction}/>
+                        <AlertDialog title="刪除" sx={styles.button} variant="contained" color="warning" onClick={handleDeleteAction}/>
                         :
                         null
                     }
@@ -250,7 +250,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                         }
                         {card && card.description?
                             <Box sx={{ pt: 2 }}>
-                                <Typography paragraph>
+                                <Typography component={'span'} paragraph>
                                     {card.description.split("\n").map((i,key) => {
                                         return <div key={key}>{i}</div>;
                                     })}

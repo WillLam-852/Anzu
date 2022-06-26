@@ -138,7 +138,7 @@ const Home = () => {
             </Box>
             <Box sx={{ pt: 2 }}>
                 <Typography variant='h4'>Contact Us</Typography>
-                <Typography paragraph>
+                <Typography paragraph component={'span'}>
                     {contact_us_text.split("\n").map((i,key) => {
                         return <div key={key}>{i}</div>;
                     })}

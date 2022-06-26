@@ -1,22 +1,30 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Stack, Typography } from '@mui/material'
+import { useSelector } from 'react-redux'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import { styled } from '@mui/material/styles'
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import http from '../http-common'
+import ResponsiveAppBar from '../components/ResponsiveAppBar'
 
 const Input = styled('input')({
     display: 'none',
 })
 
 const NewPage = () => {
+    const [titles, setTitles] = useState([])
     const [editingTitle, setEditingTitle] = useState('')
     const [currentButtonImageFile, setCurrentButtonImageFile] = useState(undefined)
     const [previewButtonImage, setPreviewButtonImage] = useState(undefined)
     const [warning, setWarning] = useState(undefined)
-    const history = useHistory()
+    const pages = useSelector((state) => state.pages)
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        setTitles(pages.titles)
+    }, [pages])
 
     const uploadButtonImage = async (page_id) => {
         const formData = new FormData()
@@ -45,7 +53,8 @@ const NewPage = () => {
                 const res_image = await uploadButtonImage(res.data.page_id)
                 if (res_image.data.success) {
                     setWarning(undefined)
-                    history.push("/Edit")
+                    navigate("/Edit")
+                    window.location.reload(true)
                 } else {
                     setWarning(`上傳相片失敗 ${res_image.data.error}`)
                 }
@@ -58,7 +67,7 @@ const NewPage = () => {
     }
 
     const handleCancelAction = () => {
-        history.push("/Edit")
+        navigate("/Edit")
     }
 
     const select_button_image = (e) => {
@@ -68,9 +77,10 @@ const NewPage = () => {
 
     return (
         <Box sx={styles.box}>
+            <ResponsiveAppBar titles={titles} edit_mode={true} />
             <Box sx={{ pb: 2 }}>
                 <Typography variant='h3'>
-                    新頁面
+                    新增頁面
                 </Typography>
             </Box>
             <Box sx={{ pb: 1.5 }}>

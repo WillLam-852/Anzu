@@ -8,16 +8,6 @@ module.exports = (app) => {
 
     var jsonParser = bodyParser.json()
 
-    // Temp Ok
-    app.post('/api/delete_all_pages', async (req, res) => {
-        try {
-            const db_res = await Models.Page.remove({})
-            res.send({ success: true, deletedCount: db_res.deletedCount })
-        } catch (err) {
-            res.send({ success: false, error: err })
-        }
-    })
-
     // Ok
     app.get('/api/all_pages', async (req, res) => {
         try {

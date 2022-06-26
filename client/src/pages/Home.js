@@ -5,8 +5,9 @@ import { Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
 import { styled } from '@mui/material/styles'
-import ResponsiveAppBar from '../components/ResponsiveAppBar'
 import { Buffer } from 'buffer'
+import ResponsiveAppBar from '../components/ResponsiveAppBar'
+import home_banner from '../images/home_banner.jpeg'
 
 const contact_us_text = `Anzu
 1605 Champion Bldg
@@ -100,7 +101,7 @@ const Home = () => {
         <Box>
             <ResponsiveAppBar titles={titles} edit_mode={editMode} />
             <Box sx={{ pb: 3 }}>
-                <Typography variant='h3'>Banner Image</Typography>
+                <img src={home_banner} alt="Home Banner" width={"100%"} />
             </Box>
             <Box>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>

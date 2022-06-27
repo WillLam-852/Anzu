@@ -153,6 +153,7 @@ const Page = () => {
                 {currentPage && currentPage.banner_image && !previewImage ?
                     <img 
                         style={{ maxWidth: 400 }}
+                        alt=''
                         src={`data:${currentPage.banner_image.img.contentType};base64,${Buffer.from(currentPage.banner_image.img.data, 'binary').toString('base64')}`} 
                     />
                 :

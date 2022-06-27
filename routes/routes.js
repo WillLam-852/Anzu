@@ -45,21 +45,22 @@ module.exports = (app) => {
 
     // Ok
     app.post('/api/upload_button_image/', upload_image.single('image'), async (req, res, next) => {
-        var obj = {
-            img: {
-                data: fs.readFileSync(path.join(__dirname, '../uploads/', req.file.filename)),
-                contentType: 'image/png'
-            }
-        }
-        try {
-            await Models.Page.findByIdAndUpdate(
-                req.body.page_id,
-                { button_image: obj }
-            )
-            res.send({ success: true })
-        } catch (err) {
-            res.send({ success: false, error: err })
-        }
+        res.send({ filePath: path.join(__dirname, '../uploads/', req.file.filename) })
+        // var obj = {
+        //     img: {
+        //         data: fs.readFileSync(path.join(__dirname, '../uploads/', req.file.filename)),
+        //         contentType: 'image/png'
+        //     }
+        // }
+        // try {
+        //     await Models.Page.findByIdAndUpdate(
+        //         req.body.page_id,
+        //         { button_image: obj }
+        //     )
+        //     res.send({ success: true })
+        // } catch (err) {
+        //     res.send({ success: false, error: err })
+        // }
     })
 
     // Ok

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
+import { Helmet } from 'react-helmet'
 import { savePages } from '../reducers/pagesReducer'
 import http from '../http-common'
 import Page from '../pages/Page'
@@ -48,6 +49,9 @@ const App = () => {
 
     return (
         <BrowserRouter>
+            <Helmet>
+                <title>Anzu</title>
+            </Helmet>
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/Edit/" element={<Home />} />

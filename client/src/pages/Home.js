@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
-import { Typography } from '@mui/material'
+import { Stack, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
 import { styled } from '@mui/material/styles'
 import { Buffer } from 'buffer'
 import ResponsiveAppBar from '../components/ResponsiveAppBar'
 import home_banner from '../images/home_banner.jpeg'
+import map_1 from '../images/map_1.PNG'
+import map_2 from '../images/map_2.PNG'
 
 const contact_us_text = `Anzu
 1605 Champion Bldg
@@ -52,15 +54,25 @@ const Home = () => {
         },
     }));
 
+    const MapImage = styled('span')(( { theme }) => ({
+        position: 'relative',
+        height: 350,
+        [theme.breakpoints.down('sm')]: {
+            width: '70% !important', // Overrides inline-style
+        },
+    }))
+
     const ImageSrc = styled('span')({
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
+        // position: 'absolute',
+        width: '100%',
+        height: '100%',
         objectFit: 'contain',
-        justify: "center",
-        alignItems: "center",
+        // maxWidth: '100%',
+        // maxeight: '100%', 
+        // left: 0,
+        // right: 0,
+        // top: 0,
+        // bottom: 0,
         backgroundPosition: 'center 40%',
         backgroundRepeat: 'no-repeat'
     });
@@ -101,53 +113,76 @@ const Home = () => {
     return (
         <Box>
             <ResponsiveAppBar titles={titles} edit_mode={editMode} />
-            <Box sx={{ pb: 3 }} style={{ maxWidth: '900px' }}>
-                <img src={home_banner} alt="Home Banner" width={"100%"} />
-            </Box>
-            <Box style={{ maxWidth: '900px' }}>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
-                    {pages && pages.pages.map((page) => (
-                        <ImageButton
-                            focusRipple
-                            href={page.title}
-                            key={page.title}
+            <Box sx={{ maxWidth: 900 }}>
+                <Box sx={{ pb: 3 }}>
+                    <img src={home_banner} alt="Home Banner" width={"100%"} />
+                </Box>
+                <Box>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
+                        {pages && pages.pages.map((page) => (
+                            <ImageButton
+                                focusRipple
+                                href={page.title}
+                                key={page.title}
+                                style={{
+                                    width: '50%',
+                                    minHeight: '200px'
+                                }}
+                            >
+                                {page.button_image ? 
+                                    <ImageSrc style={{ backgroundImage: `url(${`data:${page.button_image.img.contentType};base64,${Buffer.from(page.button_image.img.data, 'binary').toString('base64')}`})` }} /> 
+                                : 
+                                    null
+                                }
+                                <ImageBackdrop className="MuiImageBackdrop-root" />
+                                <Image>
+                                    <Typography
+                                        component="span"
+                                        variant="h4"
+                                        color="inherit"
+                                        sx={{
+                                            position: 'relative',
+                                            p: 4,
+                                            pt: 2,
+                                            pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                                        }}
+                                    >
+                                        {page.title}
+                                        <ImageMarked className="MuiImageMarked-root" />
+                                    </Typography>
+                                </Image>
+                            </ImageButton>
+                        ))}
+                    </Box>
+                </Box>
+                <Box sx={{ pt: 2 }}>
+                    <Typography variant='h4'>Contact Us</Typography>
+                    <Typography paragraph component={'span'}>
+                        {contact_us_text.split("\n").map((i,key) => {
+                            return <div key={key}>{i}</div>;
+                        })}
+                    </Typography>
+                </Box>
+                <Box>
+                    <Stack spacing={4} direction={{ xs: 'column', sm: 'row' }} alignItems="flex-start">
+                        <MapImage
                             style={{
-                                width: '50%',
-                                minHeight: '200px'
+                                width: '55%',
+                                height: '100%'
                             }}
                         >
-                            <ImageSrc style={{ backgroundImage: `url(${`data:${page.button_image.img.contentType};base64,${Buffer.from(page.button_image.img.data, 'binary').toString('base64')}`})` }} />
-                            <ImageBackdrop className="MuiImageBackdrop-root" />
-                            <Image>
-                                <Typography
-                                    component="span"
-                                    variant="h4"
-                                    color="inherit"
-                                    sx={{
-                                        position: 'relative',
-                                        p: 4,
-                                        pt: 2,
-                                        pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
-                                    }}
-                                >
-                                    {page.title}
-                                    <ImageMarked className="MuiImageMarked-root" />
-                                </Typography>
-                            </Image>
-                        </ImageButton>
-                    ))}
+                            <img src={map_1} alt="MAP 1" width="100%"/>
+                        </MapImage>
+                        <MapImage
+                            style={{
+                                width: '40%',
+                                height: '100%'
+                            }}
+                        >
+                            <img src={map_2} alt="MAP 2" width="100%"/>
+                        </MapImage>
+                    </Stack>
                 </Box>
-            </Box>
-            <Box sx={{ pt: 2 }} style={{ maxWidth: '900px' }}>
-                <Typography variant='h4'>Contact Us</Typography>
-                <Typography paragraph component={'span'}>
-                    {contact_us_text.split("\n").map((i,key) => {
-                        return <div key={key}>{i}</div>;
-                    })}
-                </Typography>
-            </Box>
-            <Box>
-                Map Image
             </Box>
         </Box>
     )

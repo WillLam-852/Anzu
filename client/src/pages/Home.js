@@ -62,6 +62,7 @@ const Home = () => {
         justify: "center",
         alignItems: "center",
         backgroundPosition: 'center 40%',
+        backgroundRepeat: 'no-repeat'
     });
 
     const Image = styled('span')(({ theme }) => ({

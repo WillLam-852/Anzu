@@ -26,7 +26,8 @@ const Card = ({ card_data, edit_mode=undefined }) => {
 
     useEffect(() => {
         setCard(card_data)
-        if (!card_data.title && !card_data.image && !card_data.description) {
+        console.log(card_data)
+        if (!card_data.card_id) {
             setIsNewCard(true)
         }
     }, [card_data])
@@ -47,75 +48,46 @@ const Card = ({ card_data, edit_mode=undefined }) => {
     const uploadImage = async (card_id) => {
         const formData = new FormData()
         formData.append('image', currentImageFile)
+        formData.append('page_id', card.page_id)
         formData.append('card_id', card_id)
         const res = await http.post("/upload_card_image", formData)
         return res
     }
 
+    const deleteImage = async (card_id) => {
+        const res = await http.post("/delete_card_image", {
+            page_id: card.page_id,
+            card_id: card_id
+        })
+        return res
+    }
+
     const handleConfirmAction = async () => {
-        if (isNewCard) {
-            const new_card = {
-                page_id: card.page_id,
-                title: editingTitle,
-                description: editingDescription,
-            }
-            try {
-                const res = await http.post("/new_card", new_card)
-                if (res.data.success) {
-                    if (currentImageFile) {
-                        const res_image = await uploadImage(res.data.card._id)
-                        if (res_image.data.success) {
-                            setCard(new_card)
-                            setWarning(undefined)
-                            setIsEdit(false)
-                            window.location.reload(true)
-                        } else {
-                            setWarning(`上傳相片失敗 ${res_image.data.error}`)
-                        }
-                    } else {
-                        setCard(new_card)
-                        setWarning(undefined)
-                        setIsEdit(false)
-                        window.location.reload(true)
-                    }
+        const new_card = {
+            page_id: card.page_id,
+            card_id: card.card_id,
+            title: editingTitle,
+            description: editingDescription,
+        }
+        try {
+            const res = isNewCard ? await http.post("/new_card", new_card) : await http.post("/edit_card", new_card)
+            if (res.data.success) {
+                if (!currentImageFile && !isImageDeleted) {
+                    window.location.reload(true)
                 } else {
-                    setWarning(`新增資料失敗 ${res.data.error}`)
-                }
-            } catch (err) {
-                setWarning(`新增資料失敗 ${err}`)
-            }
-        } else {
-            const updated_card = {
-                page_id: card.page_id,
-                card_id: card.card_id,
-                title: editingTitle,
-                description: editingDescription,
-            }
-            try {
-                const res = await http.post("/edit_card", updated_card)
-                if (res.data.success) {
-                    if (currentImageFile) {
-                        const res_image = await uploadImage(card.card_id)
-                        if (res_image.data.success) {
-                            setCard(updated_card)
-                            setWarning(undefined)
-                            setIsEdit(false)
-                            window.location.reload(true)
-                        } else {
-                            setWarning(`上傳相片失敗 ${res_image.data.error}`)
-                        }
-                    } else {
-                        setCard(updated_card)
-                        setWarning(undefined)
-                        setIsEdit(false)
+                    const card_id = isNewCard ? res.data.card._id : card.card_id
+                    const res_image = isImageDeleted ? await deleteImage(card_id) : await uploadImage(card_id)
+                    if (res_image.data.success) {
                         window.location.reload(true)
+                    } else {
+                        previewImage ? setWarning(`上傳相片失敗 ${res_image.data.error}`) : setWarning(`刪除相片失敗 ${res_image.data.error}`)
                     }
-                } else {
-                    setWarning(`更改資料失敗 ${res.data.error}`)
                 }
-            } catch (err) {
-                setWarning(`更改資料失敗 ${err}`)
+            } else {
+                isNewCard ? setWarning(`新增資料失敗 ${res.data.error}`) : setWarning(`更改資料失敗 ${res.data.error}`)
             }
+        } catch (err) {
+            isNewCard ? setWarning(`新增資料失敗 ${err}`) : setWarning(`更改資料失敗 ${err}`)
         }
     }
 
@@ -162,7 +134,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                     </Box>
                     {!isImageDeleted ? 
                         previewImage ? 
-                            <img src={previewImage} alt="" style={{ maxWidth: 400 }} />
+                            <img src={previewImage} alt="" style={styles.img} />
                         :
                             card.image ?
                                 <img 
@@ -225,20 +197,13 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                 </Box>
             :
                 <Box sx={styles.box}>
-                    <Stack sx={{ pb: 1 }} spacing={2} direction="row">
-                        {card && card.title?
-                            <Typography variant="h4">
-                                {card.title}
-                            </Typography>
-                            :
-                            null
-                        }
-                        {edit_mode ?
-                            <Button variant="outlined" size="small" onClick={handleEditAction}>{edit_mode}</Button>
-                            :
-                            null
-                        }
-                    </Stack>
+                    {card && card.title?
+                        <Typography variant="h4">
+                            {card.title}
+                        </Typography>
+                        :
+                        null
+                    }
                     <Box>
                         {card && card.image?
                             <img 
@@ -260,6 +225,11 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                             null
                         }
                     </Box>
+                    {edit_mode ?
+                        <Button variant="outlined" size="small" sx={{ mt: 1, mb: 3 }} onClick={handleEditAction}>{edit_mode}</Button>
+                        :
+                        null
+                    }
                 </Box>
         :
         null
@@ -271,8 +241,8 @@ const styles = {
         pb: 5,
     },
     img: {
-        height: 300,
-        width: null,
+        maxWidth: '100%',
+        maxHeight: 400,
     },
     button: {
         m: 1

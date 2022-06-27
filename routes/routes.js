@@ -143,7 +143,6 @@ module.exports = (app) => {
             title: req.body.title,
             description: req.body.description
         }
-        console.log(req.body.description)
         try {
             await Models.Page.updateOne(
                 { "_id": req.body.page_id, "cards._id": req.body.card_id },
@@ -173,7 +172,7 @@ module.exports = (app) => {
         }
     })
 
-
+    // Ok
     app.post('/api/upload_card_image/', upload_image.single('image'), async (req, res, next) => {
         var obj = {
             img: {
@@ -182,13 +181,28 @@ module.exports = (app) => {
             }
         }
         try {
-            console.log(obj)
-            console.log(req.body.card_id)
             await Models.Page.updateOne(
                 { "_id": req.body.page_id, "cards._id": req.body.card_id },
                 {
                     $set: {
                         "cards.$.image": obj,
+                    }
+                }
+            )
+            res.send({ success: true })
+        } catch (err) {
+            res.send({ success: false, error: err })
+        }
+    })
+
+    
+    app.post('/api/delete_card_image/', jsonParser, async (req, res) => {
+        try {
+            await Models.Page.updateOne(
+                { "_id": req.body.page_id, "cards._id": req.body.card_id },
+                {
+                    $set: {
+                        "cards.$.image": null,
                     }
                 }
             )

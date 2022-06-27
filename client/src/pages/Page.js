@@ -46,7 +46,6 @@ const Page = () => {
             let card_data = {
                 card_id: card._id,
                 title: card.title,
-                order: card.order,
                 image: card.image,
                 description: card.description,
                 page_id: currentPage._id

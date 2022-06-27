@@ -40,7 +40,6 @@ module.exports = (app) => {
             cards: [] 
         })
         const new_page = await page.save()
-        console.log('new_page._id:', new_page._id)
         res.send({ success: new_page === page, page_id: new_page._id })
     })
 

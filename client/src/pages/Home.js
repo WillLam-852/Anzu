@@ -100,10 +100,10 @@ const Home = () => {
     return (
         <Box>
             <ResponsiveAppBar titles={titles} edit_mode={editMode} />
-            <Box sx={{ pb: 3 }}>
+            <Box sx={{ pb: 3 }} style={{ maxWidth: '900px' }}>
                 <img src={home_banner} alt="Home Banner" width={"100%"} />
             </Box>
-            <Box>
+            <Box style={{ maxWidth: '900px' }}>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
                     {pages && pages.pages.map((page) => (
                         <ImageButton
@@ -137,7 +137,7 @@ const Home = () => {
                     ))}
                 </Box>
             </Box>
-            <Box sx={{ pt: 2 }}>
+            <Box sx={{ pt: 2 }} style={{ maxWidth: '900px' }}>
                 <Typography variant='h4'>Contact Us</Typography>
                 <Typography paragraph component={'span'}>
                     {contact_us_text.split("\n").map((i,key) => {

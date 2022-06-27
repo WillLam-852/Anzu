@@ -51,6 +51,7 @@ const NewPage = () => {
             const res = await http.post("/new_page", new_page)
             if (res.data.success) {
                 const res_image = await uploadButtonImage(res.data.page_id)
+                console.log('res_image:', res_image)
                 if (res_image.data.success) {
                     setWarning(undefined)
                     navigate("/Edit")
@@ -93,7 +94,7 @@ const NewPage = () => {
             </Box>
             <Box sx={{ pb: 1.5 }}>
                 {previewButtonImage && (
-                    <img src={previewButtonImage} alt="" />
+                    <img src={previewButtonImage} alt="" style={styles.img} />
                 )}
                 <Stack sx={{ pb: 1 }} spacing={2} direction="row">
                     <label htmlFor="image">
@@ -135,8 +136,8 @@ const styles = {
         pb: 5,
     },
     img: {
-        height: 300,
-        width: null,
+        maxWidth: '100%',
+        maxHeight: 400,
     },
     button: {
         m: 1

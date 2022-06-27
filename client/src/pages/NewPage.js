@@ -52,13 +52,12 @@ const NewPage = () => {
             if (res.data.success) {
                 const res_image = await uploadButtonImage(res.data.page_id)
                 console.log('res_image:', res_image)
-                if (res_image.data.success) {
-                    setWarning(undefined)
-                    navigate("/Edit")
-                    window.location.reload(true)
-                } else {
-                    setWarning(`上傳相片失敗 ${res_image.data.error}`)
-                }
+                // if (res_image.data.success) {
+                //     navigate("/Edit")
+                //     window.location.reload(true)
+                // } else {
+                //     setWarning(`上傳相片失敗 ${res_image.data.error}`)
+                // }
             } else {
                 setWarning(`新增頁面失敗 ${res.data.error}`)
             }

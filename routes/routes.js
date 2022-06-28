@@ -128,7 +128,7 @@ module.exports = (app) => {
                 res.send({ success: false, error: '找不到這頁面' })
             }
         } catch (err) {
-            res.send({ success: false, error: err })
+            res.send({ success: false, error: err.message })
         }
     })
 

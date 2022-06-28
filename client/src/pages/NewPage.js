@@ -87,9 +87,8 @@ const NewPage = () => {
         }
         const res = await http.get(`/sign-s3?file-name=${encodeURIComponent(file.name)}&file-type=${file.type}`, body)
         if (res.status === 200) {
-            console.log(res)
-            // const res = JSON.parse(res.responseText)
-            // uploadFile(file, res.signedRequest, res.url);
+            console.log(res.data)
+            uploadFile(file, res.data.signedRequest, res.data.url);
         }
         
         // xhr.onreadystatechange = () => {

@@ -31,8 +31,6 @@ if (process.env.NODE_ENV === 'production') {
         };
         
         s3.getSignedUrl('putObject', s3Params, (err, data) => {
-            console.log(err)
-            console.log(data)
             if(err){
                 return res.end();
             }
@@ -40,7 +38,6 @@ if (process.env.NODE_ENV === 'production') {
                 signedRequest: data,
                 url: `https://${keys.s3_bucket_name}.s3.amazonaws.com/${fileName}`
             };
-            console.log('returnData:', returnData)
             res.send(returnData);
         });
     });

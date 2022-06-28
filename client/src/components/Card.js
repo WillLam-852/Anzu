@@ -84,7 +84,8 @@ const Card = ({ card_data, edit_mode=undefined }) => {
         try {
             const res = await http.post("/delete_card", { 
                 page_id: card.page_id,  
-                _id: card.card_id
+                _id: card.card_id,
+                image: card.image
             })
             if (res.data.success) {
                 setCard({ page_id: card.page_id })

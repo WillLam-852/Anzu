@@ -15,33 +15,7 @@ require('./models/Models')
 require('./routes/routes')(app)
 
 
-if (process.env.NODE_ENV === 'production') {
-    const aws = require('aws-sdk')
-
-    app.get('/api/sign-s3', (req, res) => {
-        const s3 = new aws.S3();
-        const fileName = req.query['file-name'];
-        const fileType = req.query['file-type'];
-        const s3Params = {
-          Bucket: keys.s3_bucket_name,
-          Key: fileName,
-          Expires: 60,
-          ContentType: fileType,
-          ACL: 'public-read'
-        };
-        
-        s3.getSignedUrl('putObject', s3Params, (err, data) => {
-            if(err){
-                return res.end();
-            }
-            const returnData = {
-                signedRequest: data,
-                url: `https://${keys.s3_bucket_name}.s3.amazonaws.com/${fileName}`
-            };
-            res.send(returnData);
-        });
-    });
-        
+if (process.env.NODE_ENV === 'production') {        
     // Express will serve up production assets
     // like our main.js file, or main.css file!
     app.use(express.static('client/build'))

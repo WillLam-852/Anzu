@@ -1,13 +1,36 @@
 const bodyParser = require('body-parser')
-const fs = require('fs')
-const path = require('path')
+const aws = require('aws-sdk')
 const Models = require('../models/Models')
-const upload_image = require('../utils/multerStorage')
+const keys = require('../config/keys')
 
 module.exports = (app) => {
 
     var jsonParser = bodyParser.json()
 
+    app.get('/api/sign-s3', (req, res) => {
+        const s3 = new aws.S3()
+        const fileName = req.query['file-name']
+        const fileType = req.query['file-type']
+        const s3Params = {
+            Bucket: keys.s3_bucket_name,
+            Key: fileName,
+            Expires: 60,
+            ContentType: fileType,
+            ACL: 'public-read'
+        }
+        
+        s3.getSignedUrl('putObject', s3Params, (err, data) => {
+            if(err){
+                return res.end()
+            }
+            const returnData = {
+                signedRequest: data,
+                url: `https://${keys.s3_bucket_name}.s3.amazonaws.com/${fileName}`
+            }
+            res.send(returnData)
+        })
+    })
+    
     // Ok
     app.get('/api/all_pages', async (req, res) => {
         try {
@@ -67,6 +90,17 @@ module.exports = (app) => {
         try {
             const new_page = await Models.Page.findByIdAndDelete(req.body.page_id)
             if (new_page) {
+                const s3 = new aws.S3()
+                const params_banner_image = {
+                    Bucket: keys.s3_bucket_name,
+                    Key: new_page.banner_image.split("/").pop()
+                }
+                const params_button_image = {
+                    Bucket: keys.s3_bucket_name,
+                    Key: new_page.button_image.split("/").pop()
+                }
+                await s3.deleteObject(params_banner_image)
+                await s3.deleteObject(params_button_image)
                 res.send({ success: true })
             } else {
                 res.send({ success: false, error: '找不到這頁面' })
@@ -131,7 +165,13 @@ module.exports = (app) => {
                 req.body.page_id,
                 { $pull: { cards: { _id: req.body._id } } }
             )
-            res.send({ success: true })
+            const s3 = new aws.S3()
+            const params = {
+                Bucket: keys.s3_bucket_name,
+                Key: req.body.image.split("/").pop()
+            }
+            await s3.deleteObject(params)
+        res.send({ success: true })
         } catch (err) {
             res.send({ success: false, error: err })
         }

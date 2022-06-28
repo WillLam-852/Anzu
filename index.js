@@ -37,7 +37,7 @@ if (process.env.NODE_ENV === 'production') {
           }
           const returnData = {
             signedRequest: data,
-            url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}`
+            url: `https://${keys.s3_bucket_name}.s3.amazonaws.com/${fileName}`
           };
           res.write(JSON.stringify(returnData));
           res.end();

@@ -96,14 +96,14 @@ module.exports = (app) => {
                         Bucket: keys.s3_bucket_name,
                         Key: new_page.button_image.split("/").pop()
                     }
-                    s3.deleteObject(params_button_image)
+                    s3.deleteObject(params_button_image, ()=>{})
                 }
                 if (new_page.banner_image) {
                     const params_banner_image = {
                         Bucket: keys.s3_bucket_name,
                         Key: new_page.banner_image.split("/").pop()
                     }
-                    s3.deleteObject(params_banner_image)
+                    s3.deleteObject(params_banner_image, ()=>{})
                 }
                 res.send({ success: true })
             } else {
@@ -174,10 +174,10 @@ module.exports = (app) => {
                 Bucket: keys.s3_bucket_name,
                 Key: req.body.image.split("/").pop()
             }
-            s3.deleteObject(params)
+            s3.deleteObject(params, ()=>{})
             res.send({ success: true })
         } catch (err) {
-            res.send({ success: false, error: err })
+            res.send({ success: false, error: err.message })
         }
     })
 }

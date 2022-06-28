@@ -14,11 +14,11 @@ const app = express()
 require('./models/Models')
 require('./routes/routes')(app)
 
+
 if (process.env.NODE_ENV === 'production') {
     const aws = require('aws-sdk')
-    aws.config.region = 'ap-northeast-1'
 
-    app.get('/sign-s3', (req, res) => {
+    app.get('/api/sign-s3', (req, res) => {
         const s3 = new aws.S3();
         const fileName = req.query['file-name'];
         const fileType = req.query['file-type'];
@@ -29,20 +29,22 @@ if (process.env.NODE_ENV === 'production') {
           ContentType: fileType,
           ACL: 'public-read'
         };
-      
+        
         s3.getSignedUrl('putObject', s3Params, (err, data) => {
-          if(err){
-            return res.end();
-          }
-          const returnData = {
-            signedRequest: data,
-            url: `https://${keys.s3_bucket_name}.s3.amazonaws.com/${fileName}`
-          };
-          res.write(JSON.stringify(returnData));
-          res.end();
+            console.log(err)
+            console.log(data)
+            if(err){
+                return res.end();
+            }
+            const returnData = {
+                signedRequest: data,
+                url: `https://${keys.s3_bucket_name}.s3.amazonaws.com/${fileName}`
+            };
+            console.log('returnData:', returnData)
+            res.send(returnData);
         });
-      });
-    
+    });
+        
     // Express will serve up production assets
     // like our main.js file, or main.css file!
     app.use(express.static('client/build'))

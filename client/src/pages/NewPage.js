@@ -48,23 +48,23 @@ const NewPage = () => {
             title: editingTitle,
         }
         try {
-            const res = await http.post("/new_page", new_page)
-            if (res.data.success) {
-                if (process.env.NODE_ENV === 'development') {
-                    const res_image = await uploadButtonImage(res.data.page_id)
-                    console.log(res_image.data)
-                    if (res_image.data.success) {
-                        navigate("/Edit")
-                        window.location.reload(true)
-                    } else {
-                        setWarning(`上傳相片失敗 ${res_image.data.error}`)
-                    }
-                } else if (process.env.NODE_ENV === 'production') {
-                    getSignedRequest(currentButtonImageFile)
-                }
-            } else {
-                setWarning(`新增頁面失敗 ${res.data.error}`)
-            }
+            // const res = await http.post("/new_page", new_page)
+            // if (res.data.success) {
+            // if (process.env.NODE_ENV === 'development') {
+            //     const res_image = await uploadButtonImage(res.data.page_id)
+            //     console.log(res_image.data)
+            //     if (res_image.data.success) {
+            //         navigate("/Edit")
+            //         window.location.reload(true)
+            //     } else {
+            //         setWarning(`上傳相片失敗 ${res_image.data.error}`)
+            //     }
+            // } else if (process.env.NODE_ENV === 'production') {
+            await getSignedRequest(currentButtonImageFile)
+            // }
+            // } else {
+            //     setWarning(`新增頁面失敗 ${res.data.error}`)
+            // }
         } catch (err) {
             setWarning(`新增頁面失敗 ${err}`)
         }
@@ -79,23 +79,34 @@ const NewPage = () => {
         setPreviewButtonImage(URL.createObjectURL(e.target.files[0]))
     }
 
-    const getSignedRequest = (file) => {
-        const xhr = new XMLHttpRequest()
-        xhr.open('GET', `/sign-s3?file-name=${encodeURIComponent(file.name)}&file-type=${file.type}`);
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    const res = JSON.parse(xhr.responseText)
-                    uploadFile(file, res.signedRequest, res.url);
-                } else {
-                    alert('Could not get signed URL.');
-                }
-            }
-        };
-        xhr.send();
+    const getSignedRequest = async (file) => {
+        // const xhr = new XMLHttpRequest()
+        const body = {
+            file_name: encodeURIComponent(file.name),
+            file_type: file.type
+        }
+        const res = await http.get(`/sign-s3?file-name=${encodeURIComponent(file.name)}&file-type=${file.type}`, body)
+        if (res.status === 200) {
+            console.log(res)
+            // const res = JSON.parse(res.responseText)
+            // uploadFile(file, res.signedRequest, res.url);
+        }
+        
+        // xhr.onreadystatechange = () => {
+        //     if (xhr.readyState === 4) {
+        //         if (xhr.status === 200) {
+        //             const res = JSON.parse(xhr.responseText)
+        //             uploadFile(file, res.signedRequest, res.url);
+        //         } else {
+        //             alert('Could not get signed URL.');
+        //         }
+        //     }
+        // };
+        // xhr.send();
     }
 
     const uploadFile = (file, signedRequest, url) => {
+        console.log(signedRequest, url)
         const xhr = new XMLHttpRequest();
         xhr.open('PUT', signedRequest);
         xhr.onreadystatechange = () => {

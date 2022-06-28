@@ -94,18 +94,36 @@ module.exports = (app) => {
                 if (new_page.button_image) {
                     const params_button_image = {
                         Bucket: keys.s3_bucket_name,
-                        Key: new_page.button_image.split("/").pop()
+                        Key: new_page.button_image.split("/").pop(),
+                        Expires: 60,
+                        ContentType: fileType,
+                        ACL: 'public-read'
                     }
-                    s3.deleteObject(params_button_image)
+                    s3.deleteObject(params_button_image, function(err, data) {
+                        if (err) {
+                            res.send({ err: err })
+                        } else {
+                            res.send({ data: data })
+                        }
+                    })
                 }
                 if (new_page.banner_image) {
                     const params_banner_image = {
                         Bucket: keys.s3_bucket_name,
-                        Key: new_page.banner_image.split("/").pop()
+                        Key: new_page.banner_image.split("/").pop(),
+                        Expires: 60,
+                        ContentType: fileType,
+                        ACL: 'public-read'
                     }
-                    s3.deleteObject(params_banner_image)
+                    s3.deleteObject(params_banner_image, function(err, data) {
+                        if (err) {
+                            res.send({ err: err })
+                        } else {
+                            res.send({ data: data })
+                        }
+                    })
                 }
-                res.send({ success: true })
+                // res.send({ success: true })
             } else {
                 res.send({ success: false, error: '找不到這頁面' })
             }

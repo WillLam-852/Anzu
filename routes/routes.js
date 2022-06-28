@@ -97,7 +97,7 @@ module.exports = (app) => {
                         Key: new_page.button_image.split("/").pop(),
                         Expires: 60,
                         ContentType: fileType,
-                        ACL: 'public-write'
+                        ACL: 'public-read-write'
                     }
                     s3.deleteObject(params_button_image, function(err, data) {
                         if (err) {
@@ -113,7 +113,7 @@ module.exports = (app) => {
                         Key: new_page.banner_image.split("/").pop(),
                         Expires: 60,
                         ContentType: fileType,
-                        ACL: 'public-write'
+                        ACL: 'public-read-write'
                     }
                     s3.deleteObject(params_banner_image, function(err, data) {
                         if (err) {

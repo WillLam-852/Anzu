@@ -94,8 +94,7 @@ module.exports = (app) => {
                 if (new_page.button_image) {
                     const params_button_image = {
                         Bucket: keys.s3_bucket_name,
-                        Key: new_page.button_image.split("/").pop(),
-                        ACL: 'public-read-write'
+                        Key: new_page.button_image.split("/").pop()
                     }
                     s3.deleteObject(params_button_image, function(err, data) {
                         if (err) {
@@ -108,8 +107,7 @@ module.exports = (app) => {
                 if (new_page.banner_image) {
                     const params_banner_image = {
                         Bucket: keys.s3_bucket_name,
-                        Key: new_page.banner_image.split("/").pop(),
-                        ACL: 'public-read-write'
+                        Key: new_page.banner_image.split("/").pop()
                     }
                     s3.deleteObject(params_banner_image, function(err, data) {
                         if (err) {

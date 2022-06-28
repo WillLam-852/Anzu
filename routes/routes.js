@@ -96,28 +96,16 @@ module.exports = (app) => {
                         Bucket: keys.s3_bucket_name,
                         Key: new_page.button_image.split("/").pop()
                     }
-                    s3.deleteObject(params_button_image, function(err, data) {
-                        if (err) {
-                            res.send({ err: err.message })
-                        } else {
-                            res.send({ data: data })
-                        }
-                    })
+                    s3.deleteObject(params_button_image)
                 }
                 if (new_page.banner_image) {
                     const params_banner_image = {
                         Bucket: keys.s3_bucket_name,
                         Key: new_page.banner_image.split("/").pop()
                     }
-                    s3.deleteObject(params_banner_image, function(err, data) {
-                        if (err) {
-                            res.send({ err: err.message })
-                        } else {
-                            res.send({ data: data })
-                        }
-                    })
+                    s3.deleteObject(params_banner_image)
                 }
-                // res.send({ success: true })
+                res.send({ success: true })
             } else {
                 res.send({ success: false, error: '找不到這頁面' })
             }
@@ -187,7 +175,7 @@ module.exports = (app) => {
                 Key: req.body.image.split("/").pop()
             }
             s3.deleteObject(params)
-        res.send({ success: true })
+            res.send({ success: true })
         } catch (err) {
             res.send({ success: false, error: err })
         }

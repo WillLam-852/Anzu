@@ -82,11 +82,17 @@ const Card = ({ card_data, edit_mode=undefined }) => {
 
     const handleDeleteAction = async () => {
         try {
+            console.log({ 
+                page_id: card.page_id,  
+                _id: card.card_id,
+                image: card.image
+            })
             const res = await http.post("/delete_card", { 
                 page_id: card.page_id,  
                 _id: card.card_id,
                 image: card.image
             })
+            console.log('res.data:', res.data)
             if (res.data.success) {
                 setCard({ page_id: card.page_id })
                 setWarning(undefined)

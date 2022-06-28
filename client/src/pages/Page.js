@@ -121,7 +121,6 @@ const Page = () => {
         const res = await http.post("/delete_page", {
             page_id: currentPage._id
         })
-        console.log('res.data:', res.data)
         if (res.data.success) {
             navigate(`/Edit`)
             window.location.reload(true)

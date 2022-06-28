@@ -26,14 +26,6 @@ const NewPage = () => {
         setTitles(pages.titles)
     }, [pages])
 
-    const uploadButtonImage = async (page_id) => {
-        const formData = new FormData()
-        formData.append('image', currentButtonImageFile)
-        formData.append('page_id', page_id)
-        const res = await http.post("/upload_button_image", formData)
-        return res
-    }
-
     const handleConfirmAction = async (e) => {
         e.preventDefault()
         if (editingTitle === '') {
@@ -44,27 +36,37 @@ const NewPage = () => {
             setWarning('請選擇主頁按鈕照片')
             return
         }
+        try {
+            if (process.env.NODE_ENV === 'development') {
+                // const res_image = await uploadButtonImage(res.data.page_id)
+                // console.log(res_image.data)
+                // if (res_image.data.success) {
+                //     navigate("/Edit")
+                //     window.location.reload(true)
+                // } else {
+                //     setWarning(`上傳相片失敗 ${res_image.data.error}`)
+                // }
+            } else if (process.env.NODE_ENV === 'production') {
+                await getSignedRequest(currentButtonImageFile)
+            }
+        } catch (err) {
+            setWarning(`新增頁面失敗 ${err}`)
+        }
+    }
+
+    const create_new_page = async (image_url) => {
         const new_page = {
             title: editingTitle,
+            button_image: image_url
         }
         try {
-            // const res = await http.post("/new_page", new_page)
-            // if (res.data.success) {
-            // if (process.env.NODE_ENV === 'development') {
-            //     const res_image = await uploadButtonImage(res.data.page_id)
-            //     console.log(res_image.data)
-            //     if (res_image.data.success) {
-            //         navigate("/Edit")
-            //         window.location.reload(true)
-            //     } else {
-            //         setWarning(`上傳相片失敗 ${res_image.data.error}`)
-            //     }
-            // } else if (process.env.NODE_ENV === 'production') {
-            await getSignedRequest(currentButtonImageFile)
-            // }
-            // } else {
-            //     setWarning(`新增頁面失敗 ${res.data.error}`)
-            // }
+            const res = await http.post("/new_page", new_page)
+            if (res.data.success) {
+                navigate("/Edit")
+                window.location.reload(true)
+            } else {
+                setWarning(`新增頁面失敗 ${res.data.error}`)
+            }
         } catch (err) {
             setWarning(`新增頁面失敗 ${err}`)
         }
@@ -80,47 +82,32 @@ const NewPage = () => {
     }
 
     const getSignedRequest = async (file) => {
-        // const xhr = new XMLHttpRequest()
         const body = {
             file_name: encodeURIComponent(file.name),
             file_type: file.type
         }
-        const res = await http.get(`/sign-s3?file-name=${encodeURIComponent(file.name)}&file-type=${file.type}`, body)
-        if (res.status === 200) {
-            uploadFile(file, res.data.signedRequest, res.data.url);
+        try {
+            const res = await http.get(`/sign-s3?file-name=${encodeURIComponent(file.name)}&file-type=${file.type}`, body)
+            if (res.status === 200) {
+                const xhr = new XMLHttpRequest();
+                xhr.open('PUT', res.data.signedRequest);
+                xhr.onreadystatechange = async () => {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            await create_new_page(res.data.url)
+                        } else {
+                            setWarning(`上傳相片失敗`)
+                        }
+                    }
+                }
+                xhr.send(file)
+            } else {
+                setWarning(`上傳相片失敗 (連接不到S3 server)`)
+            }
+        } catch(err) {
+            throw Error
         }
-        
-        // xhr.onreadystatechange = () => {
-        //     if (xhr.readyState === 4) {
-        //         if (xhr.status === 200) {
-        //             const res = JSON.parse(xhr.responseText)
-        //             uploadFile(file, res.signedRequest, res.url);
-        //         } else {
-        //             alert('Could not get signed URL.');
-        //         }
-        //     }
-        // };
-        // xhr.send();
     }
-
-    const uploadFile = (file, signedRequest, url) => {
-        console.log(signedRequest, url)
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', signedRequest);
-        xhr.onreadystatechange = () => {
-          if(xhr.readyState === 4){
-            console.log(xhr)
-            if(xhr.status === 200){
-              document.getElementById('preview').src = url;
-              document.getElementById('avatar-url').value = url;
-            }
-            else{
-              alert('Could not upload file.');
-            }
-          }
-        };
-        xhr.send(file);
-      }
 
     return (
         <Box sx={styles.box}>

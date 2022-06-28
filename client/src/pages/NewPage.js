@@ -8,6 +8,7 @@ import { styled } from '@mui/material/styles'
 import { useNavigate } from "react-router-dom"
 import http from '../http-common'
 import ResponsiveAppBar from '../components/ResponsiveAppBar'
+import getSignedRequest from '../getSignedRequest'
 
 const Input = styled('input')({
     display: 'none',
@@ -26,6 +27,11 @@ const NewPage = () => {
         setTitles(pages.titles)
     }, [pages])
 
+    const select_button_image = (e) => {
+        setCurrentButtonImageFile(e.target.files[0])
+        setPreviewButtonImage(URL.createObjectURL(e.target.files[0]))
+    }
+
     const handleConfirmAction = async (e) => {
         e.preventDefault()
         if (editingTitle === '') {
@@ -37,17 +43,8 @@ const NewPage = () => {
             return
         }
         try {
-            if (process.env.NODE_ENV === 'development') {
-                // const res_image = await uploadButtonImage(res.data.page_id)
-                // console.log(res_image.data)
-                // if (res_image.data.success) {
-                //     navigate("/Edit")
-                //     window.location.reload(true)
-                // } else {
-                //     setWarning(`上傳相片失敗 ${res_image.data.error}`)
-                // }
-            } else if (process.env.NODE_ENV === 'production') {
-                await getSignedRequest(currentButtonImageFile)
+            if (process.env.NODE_ENV === 'production') {
+                await getSignedRequest(currentButtonImageFile, create_new_page)
             }
         } catch (err) {
             setWarning(`新增頁面失敗 ${err}`)
@@ -64,49 +61,14 @@ const NewPage = () => {
             if (res.data.success) {
                 navigate("/Edit")
                 window.location.reload(true)
-            } else {
-                setWarning(`新增頁面失敗 ${res.data.error}`)
             }
         } catch (err) {
-            setWarning(`新增頁面失敗 ${err}`)
+            throw err
         }
     }
 
     const handleCancelAction = () => {
         navigate("/Edit")
-    }
-
-    const select_button_image = (e) => {
-        setCurrentButtonImageFile(e.target.files[0])
-        setPreviewButtonImage(URL.createObjectURL(e.target.files[0]))
-    }
-
-    const getSignedRequest = async (file) => {
-        const body = {
-            file_name: encodeURIComponent(file.name),
-            file_type: file.type
-        }
-        try {
-            const res = await http.get(`/sign-s3?file-name=${encodeURIComponent(file.name)}&file-type=${file.type}`, body)
-            if (res.status === 200) {
-                const xhr = new XMLHttpRequest();
-                xhr.open('PUT', res.data.signedRequest);
-                xhr.onreadystatechange = async () => {
-                    if (xhr.readyState === 4) {
-                        if (xhr.status === 200) {
-                            await create_new_page(res.data.url)
-                        } else {
-                            setWarning(`上傳相片失敗`)
-                        }
-                    }
-                }
-                xhr.send(file)
-            } else {
-                setWarning(`上傳相片失敗 (連接不到S3 server)`)
-            }
-        } catch(err) {
-            throw Error
-        }
     }
 
     return (

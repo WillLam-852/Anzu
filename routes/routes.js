@@ -18,19 +18,6 @@ module.exports = (app) => {
         }
     })
 
-    app.get('/api/all_pages/titles', async (req, res) => {
-        try {
-            let titles = []
-            const pages = await Models.Page.find({}, 'title')
-            pages.forEach( page => {
-                titles.push(page.title)
-            })
-            res.send({ titles: titles })
-        } catch (err) {
-            res.send({ success: false, error: err })
-        }
-    })
-    
     // Ok
     app.post('/api/new_page', jsonParser, async (req, res) => {
         const page = new Models.Page({ 
@@ -44,36 +31,11 @@ module.exports = (app) => {
     })
 
     // Ok
-    app.post('/api/upload_button_image/', upload_image.single('image'), async (req, res, next) => {
-        try {
-            var obj = {
-                img: {
-                    data: fs.readFileSync(path.join(__dirname, '../uploads/', req.file.filename)),
-                    contentType: 'image/png'
-                }
-            }
-            await Models.Page.findByIdAndUpdate(
-                req.body.page_id,
-                { button_image: obj }
-            )
-            res.send({ success: true })
-        } catch (err) {
-            res.send({ success: false, error: err })
-        }
-    })
-
-    // Ok
-    app.post('/api/upload_banner_image/', upload_image.single('image'), async (req, res, next) => {
-        var obj = {
-            img: {
-                data: fs.readFileSync(path.join(__dirname, '../uploads/', req.file.filename)),
-                contentType: 'image/png'
-            }
-        }
+    app.post('/api/upload_banner_image/', jsonParser, async (req, res) => {
         try {
             await Models.Page.findByIdAndUpdate(
                 req.body.page_id,
-                { banner_image: obj }
+                { banner_image: req.body.banner_image }
             )
             res.send({ success: true })
         } catch (err) {
@@ -81,7 +43,7 @@ module.exports = (app) => {
         }
     })
     
-    // Ok
+    // Ok TODO: Add delete S3 file
     app.post('/api/delete_page', jsonParser, async (req, res) => {
         try {
             const new_page = await Models.Page.findByIdAndDelete(req.body.page_id)
@@ -116,19 +78,20 @@ module.exports = (app) => {
 
     // Ok
     app.post('/api/new_card', jsonParser, async (req, res) => {
-        const card = new Models.Card({ 
+        const obj = new Models.Card({ 
             title: req.body.title,
+            image: req.body.image,
             description: req.body.description 
         })
         try {
             const page = await Models.Page.findByIdAndUpdate(
                 req.body.page_id,
-                { $push: { cards: card } },
+                { $push: { cards: obj } },
                 { new: true }
             )
             const new_card = page.cards[page.cards.length - 1]
             if (new_card) {
-                res.send({ success: true, card: new_card })
+                res.send({ success: true, obj: new_card })
             } else {
                 res.send({ success: false, error: 'cannot find this page' })
             }
@@ -139,8 +102,9 @@ module.exports = (app) => {
 
     // Ok
     app.post('/api/edit_card', jsonParser, async (req, res) => {
-        const card = { 
+        const obj = { 
             title: req.body.title,
+            image: req.body.image,
             description: req.body.description
         }
         try {
@@ -148,8 +112,9 @@ module.exports = (app) => {
                 { "_id": req.body.page_id, "cards._id": req.body.card_id },
                 {
                     $set: {
-                        "cards.$.title": card.title,
-                        "cards.$.description": card.description,
+                        "cards.$.title": obj.title,
+                        "cards.$.image": obj.image,
+                        "cards.$.description": obj.description,
                     }
                 }
             )
@@ -159,52 +124,12 @@ module.exports = (app) => {
         }
     })
 
-    // Ok
+    // Ok TODO: Add delete S3 file
     app.post('/api/delete_card', jsonParser, async (req, res) => {
         try {
             await Models.Page.findByIdAndUpdate(
                 req.body.page_id,
                 { $pull: { cards: { _id: req.body._id } } }
-            )
-            res.send({ success: true })
-        } catch (err) {
-            res.send({ success: false, error: err })
-        }
-    })
-
-    // Ok
-    app.post('/api/upload_card_image/', upload_image.single('image'), async (req, res, next) => {
-        var obj = {
-            img: {
-                data: fs.readFileSync(path.join(__dirname, '../uploads/', req.file.filename)),
-                contentType: 'image/png'
-            }
-        }
-        try {
-            await Models.Page.updateOne(
-                { "_id": req.body.page_id, "cards._id": req.body.card_id },
-                {
-                    $set: {
-                        "cards.$.image": obj,
-                    }
-                }
-            )
-            res.send({ success: true })
-        } catch (err) {
-            res.send({ success: false, error: err })
-        }
-    })
-
-    
-    app.post('/api/delete_card_image/', jsonParser, async (req, res) => {
-        try {
-            await Models.Page.updateOne(
-                { "_id": req.body.page_id, "cards._id": req.body.card_id },
-                {
-                    $set: {
-                        "cards.$.image": null,
-                    }
-                }
             )
             res.send({ success: true })
         } catch (err) {

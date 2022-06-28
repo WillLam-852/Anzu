@@ -5,12 +5,13 @@ import { Stack, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
-import { Buffer } from 'buffer'
 import { styled } from '@mui/material/styles'
 import http from '../http-common'
 import AlertDialog from '../components/AlertDialog'
 import Card from '../components/Card'
 import ResponsiveAppBar from '../components/ResponsiveAppBar'
+import getSignedRequest from '../getSignedRequest'
+
 
 const Input = styled('input')({
     display: 'none',
@@ -93,17 +94,25 @@ const Page = () => {
             setWarning('請選擇照片')
             return
         }
-        const formData = new FormData()
-        formData.append('image', currentImageFile)
-        formData.append('page_id', currentPage._id)
-        const res = await http.post("/upload_banner_image", formData)
-        if (res.data.success) {
-            setWarning(undefined)
-            setCurrentImageFile(undefined)
-            setPreviewImage(undefined)
-            window.location.reload(true)
-        } else {
-            setWarning(`上傳相片失敗 ${res.data.error}`)
+        try {
+            if (process.env.NODE_ENV === 'production') {
+                await getSignedRequest(currentImageFile, upload_banner_image)
+            }
+        } catch (err) {
+            setWarning(`上傳照片失敗 ${err}`)
+        }
+    }
+
+    const upload_banner_image = async (image_url) => {
+        try {
+            const res = await http.post("/upload_banner_image", {
+                banner_image: image_url
+            })
+            if (res.data.success) {
+                window.location.reload(true)
+            }
+        } catch (err) {
+            throw(err)
         }
     }
 
@@ -154,7 +163,7 @@ const Page = () => {
                     <img 
                         style={{ maxWidth: 400 }}
                         alt=''
-                        src={`data:${currentPage.banner_image.img.contentType};base64,${Buffer.from(currentPage.banner_image.img.data, 'binary').toString('base64')}`} 
+                        src={currentPage.banner_image} 
                     />
                 :
                     null

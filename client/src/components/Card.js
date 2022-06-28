@@ -5,8 +5,8 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import { styled } from '@mui/material/styles'
 import http from '../http-common'
-import { Buffer } from 'buffer'
 import AlertDialog from './AlertDialog'
+import getSignedRequest from '../getSignedRequest'
 
 const Input = styled('input')({
     display: 'none',
@@ -45,49 +45,35 @@ const Card = ({ card_data, edit_mode=undefined }) => {
         setIsEdit(true)
     }
 
-    const uploadImage = async (card_id) => {
-        const formData = new FormData()
-        formData.append('image', currentImageFile)
-        formData.append('page_id', card.page_id)
-        formData.append('card_id', card_id)
-        const res = await http.post("/upload_card_image", formData)
-        return res
-    }
-
-    const deleteImage = async (card_id) => {
-        const res = await http.post("/delete_card_image", {
-            page_id: card.page_id,
-            card_id: card_id
-        })
-        return res
-    }
-
     const handleConfirmAction = async () => {
+        try {
+            if (currentImageFile) {
+                if (process.env.NODE_ENV === 'production') {
+                    await getSignedRequest(currentImageFile, update_card)
+                }
+            } else {
+                await update_card(isImageDeleted ? null : undefined)
+            }
+        } catch (err) {
+            isNewCard ? setWarning(`新增資料失敗 ${err}`) : setWarning(`更改資料失敗 ${err}`)
+        }
+    }
+
+    const update_card = async (image_url) => {
         const new_card = {
             page_id: card.page_id,
             card_id: card.card_id,
             title: editingTitle,
+            image: image_url,
             description: editingDescription,
         }
         try {
             const res = isNewCard ? await http.post("/new_card", new_card) : await http.post("/edit_card", new_card)
             if (res.data.success) {
-                if (!currentImageFile && !isImageDeleted) {
-                    window.location.reload(true)
-                } else {
-                    const card_id = isNewCard ? res.data.card._id : card.card_id
-                    const res_image = isImageDeleted ? await deleteImage(card_id) : await uploadImage(card_id)
-                    if (res_image.data.success) {
-                        window.location.reload(true)
-                    } else {
-                        previewImage ? setWarning(`上傳相片失敗 ${res_image.data.error}`) : setWarning(`刪除相片失敗 ${res_image.data.error}`)
-                    }
-                }
-            } else {
-                isNewCard ? setWarning(`新增資料失敗 ${res.data.error}`) : setWarning(`更改資料失敗 ${res.data.error}`)
+                window.location.reload(true)
             }
         } catch (err) {
-            isNewCard ? setWarning(`新增資料失敗 ${err}`) : setWarning(`更改資料失敗 ${err}`)
+            throw err
         }
     }
 
@@ -139,7 +125,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                             card.image ?
                                 <img 
                                     style={styles.img} 
-                                    src={`data:${card.image.img.contentType};base64,${Buffer.from(card.image.img.data, 'binary').toString('base64')}`}
+                                    src={card.img}
                                     alt={card.card_id} 
                                 />
                             :

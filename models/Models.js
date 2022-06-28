@@ -4,8 +4,8 @@ const { Schema } = mongoose
 const cardSchema = new Schema({
     page_id: String,
     title: String,
-    description: String,
-    image: String
+    image: String,
+    description: String
 })
 
 const pageSchema = new Schema({

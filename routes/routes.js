@@ -36,7 +36,7 @@ module.exports = (app) => {
         const page = new Models.Page({ 
             title: req.body.title,
             banner_image: null,
-            button_image: null,
+            button_image: req.body.button_image,
             cards: [] 
         })
         const new_page = await page.save()

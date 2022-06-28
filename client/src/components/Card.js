@@ -26,7 +26,6 @@ const Card = ({ card_data, edit_mode=undefined }) => {
 
     useEffect(() => {
         setCard(card_data)
-        console.log(card_data)
         if (!card_data.card_id) {
             setIsNewCard(true)
         }
@@ -68,7 +67,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
             description: editingDescription,
         }
         try {
-            const res = isNewCard ? await http.post("/new_card", new_card) : await http.post("/edit_card", new_card)
+            const res = isNewCard ? await http.post("/add_card", new_card) : await http.post("/edit_card", new_card)
             if (res.data.success) {
                 window.location.reload(true)
             }
@@ -125,7 +124,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                             card.image ?
                                 <img 
                                     style={styles.img} 
-                                    src={card.img}
+                                    src={card.image}
                                     alt={card.card_id} 
                                 />
                             :
@@ -194,7 +193,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                         {card && card.image?
                             <img 
                                 style={styles.img} 
-                                src={`data:${card.image.img.contentType};base64,${Buffer.from(card.image.img.data, 'binary').toString('base64')}`}
+                                src={card.image}
                                 alt={card.card_id} />
                             :
                             null

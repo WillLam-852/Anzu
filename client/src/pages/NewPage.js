@@ -57,7 +57,7 @@ const NewPage = () => {
             button_image: image_url
         }
         try {
-            const res = await http.post("/new_page", new_page)
+            const res = await http.post("/add_page", new_page)
             if (res.data.success) {
                 navigate("/Edit")
                 window.location.reload(true)

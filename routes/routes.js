@@ -19,7 +19,7 @@ module.exports = (app) => {
     })
 
     // Ok
-    app.post('/api/new_page', jsonParser, async (req, res) => {
+    app.post('/api/add_page', jsonParser, async (req, res) => {
         const page = new Models.Page({ 
             title: req.body.title,
             banner_image: null,
@@ -43,20 +43,6 @@ module.exports = (app) => {
         }
     })
     
-    // Ok TODO: Add delete S3 file
-    app.post('/api/delete_page', jsonParser, async (req, res) => {
-        try {
-            const new_page = await Models.Page.findByIdAndDelete(req.body.page_id)
-            if (new_page) {
-                res.send({ success: true })
-            } else {
-                res.send({ success: false, error: '找不到這頁面' })
-            }
-        } catch (err) {
-            res.send({ success: false, error: err })
-        }
-    })
-
     // Ok
     app.post('/api/edit_title', jsonParser, async (req, res) => {
         try {
@@ -76,8 +62,22 @@ module.exports = (app) => {
         }
     })
 
+    // Ok TODO: Add delete S3 file
+    app.post('/api/delete_page', jsonParser, async (req, res) => {
+        try {
+            const new_page = await Models.Page.findByIdAndDelete(req.body.page_id)
+            if (new_page) {
+                res.send({ success: true })
+            } else {
+                res.send({ success: false, error: '找不到這頁面' })
+            }
+        } catch (err) {
+            res.send({ success: false, error: err })
+        }
+    })
+
     // Ok
-    app.post('/api/new_card', jsonParser, async (req, res) => {
+    app.post('/api/add_card', jsonParser, async (req, res) => {
         const obj = new Models.Card({ 
             title: req.body.title,
             image: req.body.image,

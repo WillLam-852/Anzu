@@ -106,6 +106,7 @@ const Page = () => {
     const upload_banner_image = async (image_url) => {
         try {
             const res = await http.post("/upload_banner_image", {
+                page_id: currentPage._id,
                 banner_image: image_url
             })
             if (res.data.success) {

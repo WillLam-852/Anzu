@@ -50,16 +50,18 @@ const NewPage = () => {
         try {
             const res = await http.post("/new_page", new_page)
             if (res.data.success) {
-                getSignedRequest(currentButtonImageFile)
-                console.log('process.env.NODE_ENV', process.env.NODE_ENV)
-                // const res_image = await uploadButtonImage(res.data.page_id)
-                // console.log(res_image.data)
-                // if (res_image.data.success) {
-                //     navigate("/Edit")
-                //     window.location.reload(true)
-                // } else {
-                //     setWarning(`上傳相片失敗 ${res_image.data.error}`)
-                // }
+                if (process.env.NODE_ENV === 'development') {
+                    const res_image = await uploadButtonImage(res.data.page_id)
+                    console.log(res_image.data)
+                    if (res_image.data.success) {
+                        navigate("/Edit")
+                        window.location.reload(true)
+                    } else {
+                        setWarning(`上傳相片失敗 ${res_image.data.error}`)
+                    }
+                } else if (process.env.NODE_ENV === 'production') {
+                    getSignedRequest(currentButtonImageFile)
+                }
             } else {
                 setWarning(`新增頁面失敗 ${res.data.error}`)
             }
@@ -84,8 +86,7 @@ const NewPage = () => {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
                     const res = JSON.parse(xhr.responseText)
-                    console.log('res:', res)
-                    // uploadFile(file, res.signedRequest, res.url);
+                    uploadFile(file, res.signedRequest, res.url);
                 } else {
                     alert('Could not get signed URL.');
                 }
@@ -93,6 +94,23 @@ const NewPage = () => {
         };
         xhr.send();
     }
+
+    const uploadFile = (file, signedRequest, url) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', signedRequest);
+        xhr.onreadystatechange = () => {
+          if(xhr.readyState === 4){
+            if(xhr.status === 200){
+              document.getElementById('preview').src = url;
+              document.getElementById('avatar-url').value = url;
+            }
+            else{
+              alert('Could not upload file.');
+            }
+          }
+        };
+        xhr.send(file);
+      }
 
     return (
         <Box sx={styles.box}>

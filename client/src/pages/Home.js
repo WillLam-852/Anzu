@@ -130,7 +130,7 @@ const Home = () => {
                                 }}
                             >
                                 {page.button_image ? 
-                                    <ImageSrc style={{ backgroundImage: `url(${`data:${page.button_image.img.contentType};base64,${Buffer.from(page.button_image.img.data, 'binary').toString('base64')}`})` }} /> 
+                                    <ImageSrc style={{ backgroundImage: `url(${page.button_image})` }} /> 
                                 : 
                                     null
                                 }

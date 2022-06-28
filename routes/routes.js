@@ -91,16 +91,20 @@ module.exports = (app) => {
             const new_page = await Models.Page.findByIdAndDelete(req.body.page_id)
             if (new_page) {
                 const s3 = new aws.S3()
-                const params_banner_image = {
-                    Bucket: keys.s3_bucket_name,
-                    Key: new_page.banner_image.split("/").pop()
+                if (new_page.button_image) {
+                    const params_button_image = {
+                        Bucket: keys.s3_bucket_name,
+                        Key: new_page.button_image.split("/").pop()
+                    }
+                    s3.deleteObject(params_button_image)
                 }
-                const params_button_image = {
-                    Bucket: keys.s3_bucket_name,
-                    Key: new_page.button_image.split("/").pop()
+                if (new_page.banner_image) {
+                    const params_banner_image = {
+                        Bucket: keys.s3_bucket_name,
+                        Key: new_page.banner_image.split("/").pop()
+                    }
+                    s3.deleteObject(params_banner_image)
                 }
-                await s3.deleteObject(params_banner_image)
-                await s3.deleteObject(params_button_image)
                 res.send({ success: true })
             } else {
                 res.send({ success: false, error: '找不到這頁面' })
@@ -170,7 +174,7 @@ module.exports = (app) => {
                 Bucket: keys.s3_bucket_name,
                 Key: req.body.image.split("/").pop()
             }
-            await s3.deleteObject(params)
+            s3.deleteObject(params)
         res.send({ success: true })
         } catch (err) {
             res.send({ success: false, error: err })

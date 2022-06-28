@@ -50,14 +50,16 @@ const NewPage = () => {
         try {
             const res = await http.post("/new_page", new_page)
             if (res.data.success) {
-                const res_image = await uploadButtonImage(res.data.page_id)
-                console.log(res_image.data)
-                if (res_image.data.success) {
-                    navigate("/Edit")
-                    window.location.reload(true)
-                } else {
-                    setWarning(`上傳相片失敗 ${res_image.data.error}`)
-                }
+                getSignedRequest(currentButtonImageFile)
+                console.log('process.env.NODE_ENV', process.env.NODE_ENV)
+                // const res_image = await uploadButtonImage(res.data.page_id)
+                // console.log(res_image.data)
+                // if (res_image.data.success) {
+                //     navigate("/Edit")
+                //     window.location.reload(true)
+                // } else {
+                //     setWarning(`上傳相片失敗 ${res_image.data.error}`)
+                // }
             } else {
                 setWarning(`新增頁面失敗 ${res.data.error}`)
             }
@@ -73,6 +75,23 @@ const NewPage = () => {
     const select_button_image = (e) => {
         setCurrentButtonImageFile(e.target.files[0])
         setPreviewButtonImage(URL.createObjectURL(e.target.files[0]))
+    }
+
+    const getSignedRequest = (file) => {
+        const xhr = new XMLHttpRequest()
+        xhr.open('GET', `/sign-s3?file-name=${encodeURIComponent(file.name)}&file-type=${file.type}`);
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    const res = JSON.parse(xhr.responseText)
+                    console.log('res:', res)
+                    // uploadFile(file, res.signedRequest, res.url);
+                } else {
+                    alert('Could not get signed URL.');
+                }
+            }
+        };
+        xhr.send();
     }
 
     return (

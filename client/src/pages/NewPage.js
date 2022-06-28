@@ -87,7 +87,6 @@ const NewPage = () => {
         }
         const res = await http.get(`/sign-s3?file-name=${encodeURIComponent(file.name)}&file-type=${file.type}`, body)
         if (res.status === 200) {
-            console.log(res.data)
             uploadFile(file, res.data.signedRequest, res.data.url);
         }
         
@@ -110,6 +109,7 @@ const NewPage = () => {
         xhr.open('PUT', signedRequest);
         xhr.onreadystatechange = () => {
           if(xhr.readyState === 4){
+            console.log(xhr)
             if(xhr.status === 200){
               document.getElementById('preview').src = url;
               document.getElementById('avatar-url').value = url;

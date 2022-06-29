@@ -179,7 +179,7 @@ const Home = () => {
                     </Box>
                     <Box sx={sxs.section}>
                         <Stack spacing={4} direction={{ xs: 'column', sm: 'row' }} alignItems="flex-start">
-                            <MapImage
+                            {/* <MapImage
                                 style={{
                                     width: '40%',
                                     height: '100%'
@@ -194,7 +194,14 @@ const Home = () => {
                                 }}
                             >
                                 <img src={map_2} alt="MAP 2" width="100%"/>
-                            </MapImage>
+                            </MapImage>  */}
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3691.7605677452057!2d114.1491210154435!3d22.28705788533048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3404007dca18d291%3A0x8138ed7aac7eafa2!2sChampion%20Building%2C%20287-291%20Des%20Voeux%20Rd%20Central%2C%20Sheung%20Wan!5e0!3m2!1sen!2shk!4v1656524670425!5m2!1sen!2shk" 
+                                style={sxs.map}
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade" 
+                                title="Anzu" />
                         </Stack>
                     </Box>
                 </Box>
@@ -234,6 +241,12 @@ const sxs = {
         maxWidth: '90%',
         maxHeight: '90%',
         paddingBottom: 10
+    },
+    map: {
+        border: 0,
+        height: 450,
+        width: 800,
+        maxWidth: '100%'
     }
 }
 

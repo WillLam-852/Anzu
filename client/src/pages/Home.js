@@ -212,7 +212,6 @@ const sxs = {
             lg: 3,
             xl: 3
         },
-        pr: 1,
         width: {
             xs: '100%',
             sm: '100%',

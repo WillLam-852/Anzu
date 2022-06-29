@@ -182,9 +182,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
             {card && card.image ? <img style={sxs.img} src={card.image} alt="" /> : null}
             {card && card.description?
                 <Typography sx={sxs.paragraph} component={'span'} >
-                    {card.description.split("\n").map((line, key) => {
-                        return <div key={key}> {line} </div>
-                    })}
+                    {card.description}
                 </Typography>
             :
                 null

@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useLocation } from 'react-router-dom'
+import { logIn } from '../reducers/authReducer'
 import { Stack, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
 import { styled } from '@mui/material/styles'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
 import ResponsiveAppBar from '../components/ResponsiveAppBar'
 import home_banner from '../images/home_banner.jpeg'
 import map_1 from '../images/map_1.PNG'
 import map_2 from '../images/map_2.PNG'
-
-const contact_us_text = `Anzu
-1605 Champion Bldg
-287-291 Des Voeux Road Central
-Sheung Wan
-上環德輔道中287-291長達大廈1605室
-email : anzuhk@yahoo.com
-WhatsApp to 44459808`
+import { CONTACT_US_TEXT, ADMIN_PASSWORD } from '../constant/constants'
 
 
 const Home = () => {
     const [titles, setTitles] = useState([])
     const [editMode, setEditMode] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [editingPassword, setEditingPassword] = useState('')
     const pages = useSelector((state) => state.pages)
+    const auth = useSelector((state) => state.auth)
+    const dispatch = useDispatch()
     const location = useLocation()
 
     useEffect(() => {
@@ -31,6 +31,10 @@ const Home = () => {
         }
         setTitles(pages.titles)
     }, [pages, location.pathname])
+
+    useEffect(() => {
+        setIsLoggedIn(auth.isLoggedIn)
+    }, [auth])
 
     const ImageButton = styled(ButtonBase)(({ theme }) => ({
         position: 'relative',
@@ -60,21 +64,6 @@ const Home = () => {
             width: '70% !important', // Overrides inline-style
         },
     }))
-
-    const ImageSrc = styled('span')({
-        // position: 'absolute',
-        width: '100%',
-        height: '100%',
-        objectFit: 'contain',
-        // maxWidth: '100%',
-        // maxeight: '100%', 
-        // left: 0,
-        // right: 0,
-        // top: 0,
-        // bottom: 0,
-        backgroundPosition: 'center 40%',
-        backgroundRepeat: 'no-repeat'
-    });
 
     const Image = styled('span')(({ theme }) => ({
         position: 'absolute',
@@ -109,82 +98,133 @@ const Home = () => {
         transition: theme.transitions.create('opacity'),
     }));
 
+    const handleLoginAction = () => {
+        if (editingPassword === ADMIN_PASSWORD) {
+            setIsLoggedIn(true)
+            dispatch(logIn())
+        } else {
+            alert("密碼錯誤，請重新輸入")
+        }
+    }
+
     return (
-        <Box>
-            <ResponsiveAppBar titles={titles} edit_mode={editMode} />
-            <Box sx={{ maxWidth: 900 }}>
-                <Box sx={{ pb: 3 }}>
-                    <img src={home_banner} alt="Home Banner" width={"100%"} />
-                </Box>
-                <Box>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
-                        {pages && pages.pages.map((page) => (
-                            <ImageButton
-                                focusRipple
-                                href={page.title}
-                                key={page.title}
+        editMode && !isLoggedIn ?
+            <Stack sx={{ alignItems: 'center '}} spacing={2} direction="row">
+                <TextField 
+                    label="編輯模式 密碼" 
+                    type="password"
+                    value={editingPassword}
+                    onChange={(e) => setEditingPassword(e.target.value)}
+                    onKeyDown={(ev) => {
+                        if (ev.key === 'Enter') {
+                            handleLoginAction()
+                            ev.preventDefault();
+                        }
+                    }}
+                    variant="outlined" 
+                />
+                <Button variant="contained" onClick={handleLoginAction}> 登入 </Button>
+            </Stack>
+        :
+            <Box>
+                <ResponsiveAppBar titles={titles} edit_mode={editMode} />
+                <Box sx={sxs.container}>
+                    <Box sx={{ pb: 3 }}>
+                        <img src={home_banner} alt="Home Banner" width={"100%"} />
+                    </Box>
+                    <Box>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
+                            {pages && pages.pages.map((page) => (
+                                <ImageButton
+                                    focusRipple
+                                    href={page.title}
+                                    key={page.title}
+                                    style={{
+                                        width: '50%',
+                                        minHeight: '200px'
+                                    }}
+                                >
+                                    {page.button_image ? 
+                                        <img style={sxs.img} src={page.button_image} alt="" /> 
+                                    : 
+                                        null
+                                    }
+                                    <ImageBackdrop className="MuiImageBackdrop-root" />
+                                    <Image>
+                                        <Typography
+                                            component="span"
+                                            variant="h4"
+                                            color="inherit"
+                                            sx={{
+                                                position: 'relative',
+                                                p: 4,
+                                                pt: 2,
+                                                pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                                            }}
+                                        >
+                                            {page.title}
+                                            <ImageMarked className="MuiImageMarked-root" />
+                                        </Typography>
+                                    </Image>
+                                </ImageButton>
+                            ))}
+                        </Box>
+                    </Box>
+                    <Box sx={{ pt: 2 }}>
+                        <Typography variant='h4'>Contact Us</Typography>
+                        <Typography paragraph component={'span'}>
+                            {CONTACT_US_TEXT.split("\n").map((i,key) => {
+                                return <div key={key}>{i}</div>;
+                            })}
+                        </Typography>
+                    </Box>
+                    <Box>
+                        <Stack spacing={4} direction={{ xs: 'column', sm: 'row' }} alignItems="flex-start">
+                            <MapImage
                                 style={{
-                                    width: '50%',
-                                    minHeight: '200px'
+                                    width: '40%',
+                                    height: '100%'
                                 }}
                             >
-                                {page.button_image ? 
-                                    <ImageSrc style={{ backgroundImage: `url(${page.button_image})` }} /> 
-                                : 
-                                    null
-                                }
-                                <ImageBackdrop className="MuiImageBackdrop-root" />
-                                <Image>
-                                    <Typography
-                                        component="span"
-                                        variant="h4"
-                                        color="inherit"
-                                        sx={{
-                                            position: 'relative',
-                                            p: 4,
-                                            pt: 2,
-                                            pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
-                                        }}
-                                    >
-                                        {page.title}
-                                        <ImageMarked className="MuiImageMarked-root" />
-                                    </Typography>
-                                </Image>
-                            </ImageButton>
-                        ))}
+                                <img src={map_1} alt="MAP 1" width="100%"/>
+                            </MapImage>
+                            <MapImage
+                                style={{
+                                    width: '35%',
+                                    height: '100%'
+                                }}
+                            >
+                                <img src={map_2} alt="MAP 2" width="100%"/>
+                            </MapImage>
+                        </Stack>
                     </Box>
                 </Box>
-                <Box sx={{ pt: 2 }}>
-                    <Typography variant='h4'>Contact Us</Typography>
-                    <Typography paragraph component={'span'}>
-                        {contact_us_text.split("\n").map((i,key) => {
-                            return <div key={key}>{i}</div>;
-                        })}
-                    </Typography>
-                </Box>
-                <Box>
-                    <Stack spacing={4} direction={{ xs: 'column', sm: 'row' }} alignItems="flex-start">
-                        <MapImage
-                            style={{
-                                width: '55%',
-                                height: '100%'
-                            }}
-                        >
-                            <img src={map_1} alt="MAP 1" width="100%"/>
-                        </MapImage>
-                        <MapImage
-                            style={{
-                                width: '40%',
-                                height: '100%'
-                            }}
-                        >
-                            <img src={map_2} alt="MAP 2" width="100%"/>
-                        </MapImage>
-                    </Stack>
-                </Box>
             </Box>
-        </Box>
     )
+}
+
+const sxs = {
+    container: {
+        pl: {
+            xs: 0,
+            sm: 0,
+            md: 3,
+            lg: 3,
+            xl: 3
+        },
+        width: {
+            xs: '100%',
+            sm: '100%',
+            md: 900,
+            lg: 900,
+            xl: 900
+        }
+    },
+    img: {
+        maxWidth: '90%',
+        maxHeight: '90%',
+        paddingBottom: 10
+    }
 }
 
 export default Home

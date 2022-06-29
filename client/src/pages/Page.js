@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { logIn } from '../reducers/authReducer'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Stack, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import { styled } from '@mui/material/styles'
 import http from '../http-common'
 import AlertDialog from '../components/AlertDialog'
 import Card from '../components/Card'
 import ResponsiveAppBar from '../components/ResponsiveAppBar'
 import getSignedRequest from '../getSignedRequest'
+import { ADMIN_PASSWORD } from '../constant/constants'
 
 
 const Input = styled('input')({
@@ -21,15 +24,20 @@ const Page = () => {
     const [titles, setTitles] = useState([])
     const [currentPage, setCurrentPage] = useState(undefined)
     const [editMode, setEditMode] = useState(false)
-    const [isEdittingTitle, setIsEdittingTitle] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const [editingPassword, setEditingPassword] = useState('')
+    const [isEditingTitle, setIsEditingTitle] = useState(false)
     const [editingTitle, setEditingTitle] = useState('')
     const [isImageDeleted, setIsImageDeleted] = useState(false)
     const [currentImageFile, setCurrentImageFile] = useState(undefined)
     const [previewImage, setPreviewImage] = useState(undefined)
     const location = useLocation()
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const pages = useSelector((state) => state.pages)
+    const auth = useSelector((state) => state.auth)
 
     useEffect(() => {
         let path_title = decodeURIComponent(location.pathname.slice(1))
@@ -42,6 +50,10 @@ const Page = () => {
     }, [pages, location.pathname])
 
     useEffect(() => {
+        setIsLoggedIn(auth.isLoggedIn)
+    }, [auth])
+    
+    useEffect(() => {
         if (currentPage && currentPage.banner_image) {
             setIsImageDeleted(false)
         } else {
@@ -50,7 +62,7 @@ const Page = () => {
     }, [currentPage])
     
     const handleEditTitleAction = () => {
-        setIsEdittingTitle(true)
+        setIsEditingTitle(true)
         setEditingTitle(currentPage.title)
     }
 
@@ -60,7 +72,7 @@ const Page = () => {
             title: editingTitle
         })
         if (res.data.success) {
-            setIsEdittingTitle(false)
+            setIsEditingTitle(false)
             navigate(`/Edit/${editingTitle}`)
             window.location.reload(true)
         } else {
@@ -69,7 +81,7 @@ const Page = () => {
     }
 
     const handleCancelTitleAction = () => {
-        setIsEdittingTitle(false)
+        setIsEditingTitle(false)
     }
 
     const handleDeletePageAction = async () => {
@@ -109,8 +121,10 @@ const Page = () => {
             return
         }
         try {
+            setIsLoading(true)
             await getSignedRequest(currentImageFile, upload_banner_image)
         } catch (err) {
+            setIsLoading(true)
             alert(`上傳照片失敗 (${err})`)
         }
     }
@@ -151,7 +165,7 @@ const Page = () => {
     ///// View-related Functions /////
     
     const show_title = () => {
-        if (isEdittingTitle) {
+        if (isEditingTitle) {
             return (
                 <Box>
                     <TextField 
@@ -196,39 +210,89 @@ const Page = () => {
         return rows
     }
 
+    const handleLoginAction = () => {
+        if (editingPassword === ADMIN_PASSWORD) {
+            setIsLoggedIn(true)
+            dispatch(logIn())
+        } else {
+            alert("密碼錯誤，請重新輸入")
+        }
+    }
+
     return (
-        <Box>
-            <ResponsiveAppBar titles={titles} edit_mode={editMode} />
-            <Box sx={sxs.section}>
-                {show_title()}
-            </Box>
-            <Box sx={sxs.section}>
-                {show_banner_image()}
-                <Stack sx={sxs.box} spacing={2} direction="row">
-                    {previewImage ? <Button variant="contained" component="span" onClick={handleUploadImageAction}> 上傳照片 </Button> : null}
-                    <label htmlFor="image">
-                        <Input accept="image/*" id="image" type="file" name='image' onChange={select_banner_image} />
-                        <Button variant="outlined" component="span">
-                            {previewImage || (currentPage && currentPage.banner_image)? "更改照片" : "選擇照片"}
-                        </Button>
-                    </label>
-                    {previewImage || (currentPage && currentPage.banner_image) ? <AlertDialog title="刪除照片" variant="contained" color="warning" onClick={delete_banner_image} /> : null }
-                </Stack>
-            </Box>
-            {currentPage ? get_cards(currentPage.cards) : null}
-            {currentPage && editMode ? 
-                <Box>
-                    <Card card_data={{ page_id: currentPage._id }} edit_mode="新增" />
-                    <AlertDialog title="刪除頁面" variant="contained" color="warning" onClick={handleDeletePageAction}/>
+        editMode && !isLoggedIn ?
+            <Stack sx={{ alignItems: 'center '}} spacing={2} direction="row">
+                <TextField 
+                    label="編輯模式 密碼" 
+                    type="password"
+                    value={editingPassword}
+                    onChange={(e) => setEditingPassword(e.target.value)}
+                    onKeyDown={(ev) => {
+                        if (ev.key === 'Enter') {
+                            handleLoginAction()
+                            ev.preventDefault();
+                        }
+                    }}
+                    variant="outlined" 
+                />
+                <Button variant="contained" onClick={handleLoginAction}> 登入 </Button>
+            </Stack>
+        :
+            <Box>
+                <ResponsiveAppBar titles={titles} edit_mode={editMode} />
+                <Box sx={sxs.container}>
+                    <Box sx={sxs.section}>
+                        {show_title()}
+                    </Box>
+                    <Box sx={sxs.section}>
+                        {show_banner_image()}
+                        {editMode ?
+                            <Stack sx={sxs.box} spacing={2} direction="row">
+                                {previewImage ? <Button variant="contained" component="span" onClick={handleUploadImageAction}> 上傳照片 </Button> : null}
+                                <label htmlFor="image">
+                                    <Input accept="image/*" id="image" type="file" name='image' onChange={select_banner_image} />
+                                    <Button variant="outlined" component="span">
+                                        {previewImage || (currentPage && currentPage.banner_image)? "更改照片" : "選擇照片"}
+                                    </Button>
+                                </label>
+                                {previewImage || (currentPage && currentPage.banner_image) ? <AlertDialog title="刪除照片" variant="contained" color="warning" onClick={delete_banner_image} /> : null }
+                            </Stack>
+                        :
+                            null
+                        }
+                    </Box>
+                    {currentPage ? get_cards(currentPage.cards) : null}
+                    {currentPage && editMode ? 
+                        <Box sx={sxs.box}>
+                            <Card card_data={{ page_id: currentPage._id }} edit_mode="新增" />
+                            <AlertDialog title="刪除頁面" variant="contained" color="warning" onClick={handleDeletePageAction}/>
+                        </Box>
+                    :
+                        null
+                    }
+                    { isLoading ? <Box sx={sxs.box}> <CircularProgress /> </Box> : null}
                 </Box>
-            :
-                null
-            }
-        </Box>
+            </Box>
     )
 }
 
 const sxs = {
+    container: {
+        pl: {
+            xs: 0,
+            sm: 0,
+            md: 3,
+            lg: 3,
+            xl: 3
+        },
+        width: {
+            xs: '100%',
+            sm: '100%',
+            md: 900,
+            lg: 900,
+            xl: 900
+        }
+    },
     section: {
         pb: 3
     },

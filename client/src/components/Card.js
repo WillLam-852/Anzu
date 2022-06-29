@@ -3,6 +3,7 @@ import { Stack, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import { styled } from '@mui/material/styles'
 import http from '../http-common'
 import AlertDialog from './AlertDialog'
@@ -13,10 +14,11 @@ const Input = styled('input')({
 })
 
 const Card = ({ card_data, edit_mode=undefined }) => {
-    const [isEditting, setIsEditting] = useState(false)
+    const [isEditing, setIsEditing] = useState(false)
     const [isNewCard, setIsNewCard] = useState(false)
     const [isDeleted, setIsDeleted] = useState(false)
     const [isImageDeleted, setIsImageDeleted] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [card, setCard] = useState(undefined)
     const [editingTitle, setEditingTitle] = useState(undefined)
     const [editingDescription, setEditingDescription] = useState(undefined)
@@ -40,7 +42,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                 setIsImageDeleted(true)
             }
         }
-        setIsEditting(true)
+        setIsEditing(true)
     }
 
 
@@ -49,11 +51,13 @@ const Card = ({ card_data, edit_mode=undefined }) => {
     const handleConfirmAction = async () => {
         try {
             if (currentImageFile) {
+                setIsLoading(true)
                 await getSignedRequest(currentImageFile, update_card)
             } else {
                 await update_card(isImageDeleted ? null : undefined)
             }
         } catch (err) {
+            setIsLoading(false)
             isNewCard ? alert(`新增資料失敗 (${err.message})`) : alert(`更改資料失敗 (${err.message})`)
         }
     }
@@ -77,7 +81,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
     }
 
     const handleCancelAction = () => {
-        setIsEditting(false)
+        setIsEditing(false)
     }
 
     const handleDeleteAction = async () => {
@@ -88,7 +92,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
             })
             if (res.data.success) {
                 setCard({ page_id: card.page_id })
-                setIsEditting(false)
+                setIsEditing(false)
                 setIsDeleted(true)
             } else {
                 alert(`新增資料失敗 (${res.data.error})`)
@@ -168,6 +172,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                     null
                 }
             </Stack>
+            { isLoading ? <Box sx={sxs.box}> <CircularProgress /> </Box> : null}
         </Box>
     )
 
@@ -194,7 +199,7 @@ const Card = ({ card_data, edit_mode=undefined }) => {
         isDeleted ?
             null
         :
-            isEditting ? 
+            isEditing ? 
                 show_edit_view()
             :
                 show_normal_view()

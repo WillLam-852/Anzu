@@ -1,8 +1,19 @@
-import { createReducer } from "@reduxjs/toolkit"
+import { createSlice } from "@reduxjs/toolkit"
 
-const initialState = {}
+const initialState = { 
+    isLoggedIn: false
+}
 
-const authReducer = createReducer(initialState, (builder) => {
+export const authSlice = createSlice({
+    name: 'auth',
+    initialState,
+    reducers: {
+        logIn: (state, action) => {
+            state.isLoggedIn = true
+        }
+    }
 })
 
-export default authReducer
+export const { logIn } = authSlice.actions
+
+export default authSlice.reducer

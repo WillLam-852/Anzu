@@ -19,7 +19,6 @@ const NewPage = () => {
     const [editingTitle, setEditingTitle] = useState('')
     const [currentButtonImageFile, setCurrentButtonImageFile] = useState(undefined)
     const [previewButtonImage, setPreviewButtonImage] = useState(undefined)
-    const [warning, setWarning] = useState(undefined)
     const pages = useSelector((state) => state.pages)
     const navigate = useNavigate()
 
@@ -28,26 +27,26 @@ const NewPage = () => {
     }, [pages])
 
     const select_button_image = (e) => {
-        setCurrentButtonImageFile(e.target.files[0])
-        setPreviewButtonImage(URL.createObjectURL(e.target.files[0]))
+        if (e.target.files.length !== 0) {
+            setCurrentButtonImageFile(e.target.files[0])
+            setPreviewButtonImage(URL.createObjectURL(e.target.files[0]))
+        }
     }
 
     const handleConfirmAction = async (e) => {
         e.preventDefault()
         if (editingTitle === '') {
-            setWarning('請輸入頁面標題')
+            alert('請輸入頁面標題')
             return
         }
         if (!currentButtonImageFile) {
-            setWarning('請選擇主頁按鈕照片')
+            alert('請選擇主頁按鈕照片')
             return
         }
         try {
-            if (process.env.NODE_ENV === 'production') {
-                await getSignedRequest(currentButtonImageFile, create_new_page)
-            }
+            await getSignedRequest(currentButtonImageFile, create_new_page)
         } catch (err) {
-            setWarning(`新增頁面失敗 ${err}`)
+            alert(`新增頁面失敗 (${err})`)
         }
     }
 
@@ -115,13 +114,6 @@ const NewPage = () => {
             </Box>
             <Button sx={styles.button} variant="contained" onClick={handleConfirmAction}>確定</Button>
             <Button sx={styles.button} variant="outlined" onClick={handleCancelAction}>取消</Button>
-            {warning ? 
-                <Box>
-                    <Typography variant='h7' color='red'>{warning}</Typography>
-                </Box>
-            :
-                null
-            }
         </Box>
     )
 }

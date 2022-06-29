@@ -13,7 +13,7 @@ const Input = styled('input')({
 })
 
 const Card = ({ card_data, edit_mode=undefined }) => {
-    const [isEdit, setIsEdit] = useState(false)
+    const [isEditting, setIsEditting] = useState(false)
     const [isNewCard, setIsNewCard] = useState(false)
     const [isDeleted, setIsDeleted] = useState(false)
     const [isImageDeleted, setIsImageDeleted] = useState(false)
@@ -22,7 +22,6 @@ const Card = ({ card_data, edit_mode=undefined }) => {
     const [editingDescription, setEditingDescription] = useState(undefined)
     const [currentImageFile, setCurrentImageFile] = useState(undefined)
     const [previewImage, setPreviewImage] = useState(undefined)
-    const [warning, setWarning] = useState(undefined)
 
     useEffect(() => {
         setCard(card_data)
@@ -41,20 +40,21 @@ const Card = ({ card_data, edit_mode=undefined }) => {
                 setIsImageDeleted(true)
             }
         }
-        setIsEdit(true)
+        setIsEditting(true)
     }
+
+
+    ///// API-related Functions /////
 
     const handleConfirmAction = async () => {
         try {
             if (currentImageFile) {
-                if (process.env.NODE_ENV === 'production') {
-                    await getSignedRequest(currentImageFile, update_card)
-                }
+                await getSignedRequest(currentImageFile, update_card)
             } else {
                 await update_card(isImageDeleted ? null : undefined)
             }
         } catch (err) {
-            isNewCard ? setWarning(`新增資料失敗 ${err}`) : setWarning(`更改資料失敗 ${err}`)
+            isNewCard ? alert(`新增資料失敗 (${err.message})`) : alert(`更改資料失敗 (${err.message})`)
         }
     }
 
@@ -77,167 +77,141 @@ const Card = ({ card_data, edit_mode=undefined }) => {
     }
 
     const handleCancelAction = () => {
-        setIsEdit(false)
+        setIsEditting(false)
     }
 
     const handleDeleteAction = async () => {
         try {
-            console.log({ 
-                page_id: card.page_id,  
-                _id: card.card_id,
-                image: card.image
-            })
             const res = await http.post("/delete_card", { 
                 page_id: card.page_id,  
-                _id: card.card_id,
-                image: card.image
+                card_id: card.card_id
             })
-            console.log('res.data:', res.data)
             if (res.data.success) {
                 setCard({ page_id: card.page_id })
-                setWarning(undefined)
-                setIsEdit(false)
+                setIsEditting(false)
                 setIsDeleted(true)
             } else {
-                setWarning(`新增資料失敗 ${res.data.error}`)
+                alert(`新增資料失敗 (${res.data.error})`)
             }
         } catch (err) {
-            setWarning(`新增資料失敗 ${err}`)
+            alert(`新增資料失敗 (${err.message})`)
+        }
+    }
+
+    ///// Image-related Functions /////
+
+    const show_image = () => {
+        if (isImageDeleted) {
+            return null
+        }
+        if (previewImage) {
+            return <img style={sxs.img} src={previewImage} alt="" />
+        } else {
+            return <img style={sxs.img} src={card.image} alt="" />
         }
     }
 
     const select_image = (e) => {
-        setCurrentImageFile(e.target.files[0])
-        setPreviewImage(URL.createObjectURL(e.target.files[0]))
-        setIsImageDeleted(false)
+        if (e.target.files.length !== 0) {
+            setCurrentImageFile(e.target.files[0])
+            setPreviewImage(URL.createObjectURL(e.target.files[0]))
+            setIsImageDeleted(false)
+        }
     }
+
+    const remove_selected_image = () => {
+        setCurrentImageFile(undefined)
+        setPreviewImage(undefined)
+        setIsImageDeleted(true)
+    }
+
+
+    ///// View-related Functions /////
+
+    const show_edit_view = () => (
+        <Box sx={sxs.card}>
+            <Box sx={sxs.box}>
+                <TextField 
+                    sx={{ width: 400, maxWidth: '100%' }}
+                    label="標題 (可留空)" 
+                    value={editingTitle}
+                    onChange={(e) => setEditingTitle(e.target.value)}
+                    variant="outlined" 
+                />
+            </Box>
+            {show_image()}
+            <Stack sx={sxs.box} spacing={2} direction="row">
+                <label htmlFor="card_image">
+                    <Input accept="image/*" id="card_image" type="file" name='image' onChange={select_image} />
+                    <Button variant="outlined" component="span">
+                        {previewImage || card.image? "更改照片" : "選擇照片"}
+                    </Button>
+                </label>
+                {previewImage || card.image ? <Button variant="outlined" component="span" color="warning" onClick={remove_selected_image}> 刪除照片 </Button> : null }
+            </Stack>
+            <Box sx={sxs.box}>
+                <TextField
+                    style={{ width: 600, maxWidth: '100%' }}
+                    label="文字 (可留空，按空格鍵去下一行)"
+                    multiline
+                    value={editingDescription}
+                    onChange={(e) => setEditingDescription(e.target.value)}
+                    variant="outlined"
+                />
+            </Box>
+            <Stack sx={sxs.box} spacing={2} direction="row">
+                <Button variant="contained" onClick={handleConfirmAction}>確定</Button>
+                <Button variant="outlined" onClick={handleCancelAction}>取消</Button>
+                {!isNewCard?
+                    <AlertDialog title="刪除" variant="contained" color="warning" onClick={handleDeleteAction}/>
+                    :
+                    null
+                }
+            </Stack>
+        </Box>
+    )
+
+    const show_normal_view = () => (
+        <Box sx={sxs.card}>
+            {card && card.title ? <Typography sx={sxs.box} variant="h4"> {card.title} </Typography> : null}
+            {card && card.image ? <img style={sxs.img} src={card.image} alt="" /> : null}
+            {card && card.description?
+                <Typography sx={sxs.box} component={'span'}>
+                    {card.description.split("\n").map((i,key) => {
+                        return <div key={key}>{i}</div>
+                    })}
+                </Typography>
+            :
+                null
+            }
+            <Box sx={sxs.box}>
+                {edit_mode ? <Button variant="outlined" onClick={handleEditAction}> {edit_mode} </Button> : null }
+            </Box>
+        </Box>
+    )
     
     return (
-        !isDeleted ?
-            isEdit ? 
-                <Box sx={styles.box}>
-                    <Box sx={{ pb: 1.5 }}>
-                        <TextField 
-                            label="標題 (可留空)" 
-                            value={editingTitle}
-                            onChange={(e) => setEditingTitle(e.target.value)}
-                            variant="outlined" 
-                        />
-                    </Box>
-                    {!isImageDeleted ? 
-                        previewImage ? 
-                            <img src={previewImage} alt="" style={styles.img} />
-                        :
-                            card.image ?
-                                <img 
-                                    style={styles.img} 
-                                    src={card.image}
-                                    alt={card.card_id} 
-                                />
-                            :
-                                null
-                    :
-                        null
-                    }
-                    <Stack sx={{ pb: 1 }} spacing={2} direction="row">
-                        <label htmlFor="card_image">
-                            <Input accept="image/*" id="card_image" type="file" name='image' onChange={select_image} />
-                            <Box>
-                                <Button variant="outlined" component="span">
-                                    {previewImage || card.image? "更改照片" : "選擇照片"}
-                                </Button>
-                            </Box>
-                        </label>
-                        {previewImage || card.image ?
-                            <Box>
-                                <Button variant="outlined" component="span" color="warning" onClick={() => {
-                                    setCurrentImageFile(undefined)
-                                    setPreviewImage(undefined)
-                                    setIsImageDeleted(true)
-                                }}>
-                                    刪除照片
-                                </Button>
-                            </Box>
-                        :
-                        null}
-                    </Stack>
-                    <Box sx={{ pt: 1.5 }}>
-                        <TextField
-                            style={{ width: 700, flex: 1 }}
-                            label="文字 (可留空)"
-                            multiline
-                            rows={4}
-                            value={editingDescription}
-                            onChange={(e) => setEditingDescription(e.target.value)}
-                            variant="outlined"
-                        />
-                    </Box>
-                    <Button sx={styles.button} variant="contained" onClick={handleConfirmAction}>確定</Button>
-                    <Button sx={styles.button} variant="outlined" onClick={handleCancelAction}>取消</Button>
-                    {!isNewCard?
-                        <AlertDialog title="刪除" sx={styles.button} variant="contained" color="warning" onClick={handleDeleteAction}/>
-                        :
-                        null
-                    }
-                    {warning ? 
-                        <Box>
-                            <Typography variant='h7' color='red'>{warning}</Typography>
-                        </Box>
-                    :
-                        null
-                    }
-                </Box>
-            :
-                <Box sx={styles.box}>
-                    {card && card.title?
-                        <Typography variant="h4">
-                            {card.title}
-                        </Typography>
-                        :
-                        null
-                    }
-                    <Box>
-                        {card && card.image?
-                            <img 
-                                style={styles.img} 
-                                src={card.image}
-                                alt={card.card_id} />
-                            :
-                            null
-                        }
-                        {card && card.description?
-                            <Box sx={{ pt: 2 }}>
-                                <Typography component={'span'} paragraph>
-                                    {card.description.split("\n").map((i,key) => {
-                                        return <div key={key}>{i}</div>;
-                                    })}
-                                </Typography>
-                            </Box>
-                            :
-                            null
-                        }
-                    </Box>
-                    {edit_mode ?
-                        <Button variant="outlined" size="small" sx={{ mt: 1, mb: 3 }} onClick={handleEditAction}>{edit_mode}</Button>
-                        :
-                        null
-                    }
-                </Box>
+        isDeleted ?
+            null
         :
-        null
+            isEditting ? 
+                show_edit_view()
+            :
+                show_normal_view()
     )
 }
 
-const styles = {
+const sxs = {
+    card: {
+        pb: 5
+    },
     box: {
-        pb: 5,
+        pb: 2
     },
     img: {
         maxWidth: '100%',
         maxHeight: 400,
-    },
-    button: {
-        m: 1
+        paddingBottom: 10
     }
 }
 

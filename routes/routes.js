@@ -65,6 +65,24 @@ module.exports = (app) => {
             res.send({ success: false, error: err })
         }
     })
+
+    app.post('/api/delete_banner_image/', jsonParser, async (req, res) => {
+        try {
+            const page = await Models.Page.findByIdAndUpdate(
+                req.body.page_id,
+                { banner_image: null }
+            )
+            const s3 = new aws.S3()
+            const s3Params = {
+                Bucket: keys.s3_bucket_name,
+                Key: page.banner_image.split("/").pop()
+            }
+            s3.deleteObject(s3Params, ()=>{})
+            res.send({ success: true })
+        } catch (err) {
+            res.send({ success: false, error: err })
+        }
+    })
     
     // Ok
     app.post('/api/edit_title', jsonParser, async (req, res) => {
@@ -85,25 +103,37 @@ module.exports = (app) => {
         }
     })
 
-    // Ok TODO: Add delete S3 file
+    // Ok
     app.post('/api/delete_page', jsonParser, async (req, res) => {
         try {
-            const new_page = await Models.Page.findByIdAndDelete(req.body.page_id)
-            if (new_page) {
-                const s3 = new aws.S3()
-                if (new_page.button_image) {
-                    const params_button_image = {
-                        Bucket: keys.s3_bucket_name,
-                        Key: new_page.button_image.split("/").pop()
-                    }
-                    s3.deleteObject(params_button_image, ()=>{})
+            const deleted_page = await Models.Page.findByIdAndDelete(req.body.page_id)
+            if (deleted_page) {
+                let delete_images = []
+                if (deleted_page.button_image) {
+                    delete_images.push({
+                        Key: deleted_page.button_image.split("/").pop()
+                    })
                 }
-                if (new_page.banner_image) {
-                    const params_banner_image = {
-                        Bucket: keys.s3_bucket_name,
-                        Key: new_page.banner_image.split("/").pop()
+                if (deleted_page.banner_image) {
+                    delete_images.push({
+                        Key: deleted_page.banner_image.split("/").pop()
+                    })
+                }
+                delete_images = delete_images.concat(deleted_page.cards.map(({ image }) => {
+                    return {
+                        Key: image.split("/").pop()
                     }
-                    s3.deleteObject(params_banner_image, ()=>{})
+                }))
+                if (delete_images.length != 0) {
+                    const s3 = new aws.S3()
+                    const s3Params = {
+                        Bucket: keys.s3_bucket_name,
+                        Delete: { 
+                            Objects: delete_images,
+                            Quiet: true
+                        }
+                    }
+                    s3.deleteObjects(s3Params, ()=>{})
                 }
                 res.send({ success: true })
             } else {
@@ -146,6 +176,8 @@ module.exports = (app) => {
             description: req.body.description
         }
         try {
+            const originalpage = await Models.Page.findById(req.body.page_id)
+            const original_card_image = originalpage.cards.find(card => card._id == req.body.card_id ).image
             await Models.Page.updateOne(
                 { "_id": req.body.page_id, "cards._id": req.body.card_id },
                 {
@@ -156,25 +188,37 @@ module.exports = (app) => {
                     }
                 }
             )
+            if (original_card_image && !obj.image) {
+                const s3 = new aws.S3()
+                const s3Params = {
+                    Bucket: keys.s3_bucket_name,
+                    Key: original_card_image.split("/").pop()
+                }
+                s3.deleteObject(s3Params, ()=>{})
+            }
             res.send({ success: true })
         } catch (err) {
             res.send({ success: false, error: err })
         }
     })
 
-    // Ok TODO: Add delete S3 file
+    // Ok
     app.post('/api/delete_card', jsonParser, async (req, res) => {
         try {
-            await Models.Page.findByIdAndUpdate(
+            const page = await Models.Page.findByIdAndUpdate(
                 req.body.page_id,
-                { $pull: { cards: { _id: req.body._id } } }
+                { $pull: { cards: { _id: req.body.card_id } } }
             )
-            const s3 = new aws.S3()
-            const params = {
-                Bucket: keys.s3_bucket_name,
-                Key: req.body.image.split("/").pop()
+            if (page.cards.find(card => card._id == req.body.card_id ).image) {
+                const delete_image = page.cards.find(card => card._id == req.body.card_id ).image.split("/").pop()
+                console.log('delete_image:', delete_image)
+                const s3 = new aws.S3()
+                const s3Params = {
+                    Bucket: keys.s3_bucket_name,
+                    Key: delete_image.split("/").pop()
+                }
+                s3.deleteObject(s3Params, ()=>{})
             }
-            s3.deleteObject(params, ()=>{})
             res.send({ success: true })
         } catch (err) {
             res.send({ success: false, error: err.message })

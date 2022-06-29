@@ -109,7 +109,7 @@ const Home = () => {
 
     return (
         editMode && !isLoggedIn ?
-            <Stack sx={{ alignItems: 'center '}} spacing={2} direction="row">
+            <Stack sx={sxs.login} spacing={2} direction="row">
                 <TextField 
                     label="編輯模式 密碼" 
                     type="password"
@@ -137,18 +137,15 @@ const Home = () => {
                             {pages && pages.pages.map((page) => (
                                 <ImageButton
                                     focusRipple
-                                    href={page.title}
+                                    href={`${editMode?'/Edit':''}/${page.title}`}
                                     key={page.title}
                                     style={{
                                         width: '50%',
+                                        border: '2px solid white',
                                         minHeight: '200px'
                                     }}
                                 >
-                                    {page.button_image ? 
-                                        <img style={sxs.img} src={page.button_image} alt="" /> 
-                                    : 
-                                        null
-                                    }
+                                    {page.button_image ? <img style={sxs.img} src={page.button_image} alt="" /> : null}
                                     <ImageBackdrop className="MuiImageBackdrop-root" />
                                     <Image>
                                         <Typography
@@ -219,6 +216,11 @@ const sxs = {
             lg: 900,
             xl: 900
         }
+    },
+    login: {
+        pl: 3,
+        pt: 3,
+        alignItems: 'center'
     },
     section: {
         pb: 4

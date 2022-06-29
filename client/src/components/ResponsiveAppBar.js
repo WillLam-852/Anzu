@@ -75,6 +75,13 @@ const ResponsiveAppBar = ({ titles, edit_mode=false }) => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
+              <MenuItem key={'home'} onClick={handleCloseNavMenu}>
+                <Typography textAlign="center">
+                  <Link style={{ textDecoration: "none", color: "black" }} to={edit_mode ? `/Edit` : `/`}>
+                    主頁
+                  </Link>
+                </Typography>
+              </MenuItem>
               {titles.map((title) => (
                 <MenuItem key={title} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">

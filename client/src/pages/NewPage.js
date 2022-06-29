@@ -97,7 +97,7 @@ const NewPage = () => {
 
     return (
         !isLoggedIn ?
-            <Stack sx={{ alignItems: 'center '}} spacing={2} direction="row">
+            <Stack sx={sxs.login} spacing={2} direction="row">
                 <TextField 
                     label="編輯模式 密碼" 
                     type="password"
@@ -183,6 +183,11 @@ const sxs = {
             lg: 900,
             xl: 900
         }
+    },
+    login: {
+        pl: 3,
+        pt: 3,
+        alignItems: 'center'
     },
     box: {
         pb: 2,

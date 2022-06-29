@@ -41,8 +41,8 @@ const App = () => {
     const get_routes = (titles) => {
         var rows = []
         titles.forEach( title => {
-            rows.push(<Route path={`/${encodeURIComponent(title)}`} element={<Page />} key={title}/>)
-            rows.push(<Route path={`/Edit/${encodeURIComponent(title)}`} element={<Page />} key={`Edit/${title}`}/>)
+            rows.push(<Route path={`/${encodeURIComponent(title.replace(/(\r\n|\n|\r)/gm, ''))}`} element={<Page />} key={title}/>)
+            rows.push(<Route path={`/Edit/${encodeURIComponent(title.replace(/(\r\n|\n|\r)/gm, ''))}`} element={<Page />} key={`Edit/${title}`}/>)
         })
         return rows
     }

@@ -123,14 +123,14 @@ const NewPage = () => {
                             新增頁面
                         </Typography>
                     </Box>
-                    <Box sx={sxs.box}>
-                        <TextField 
-                            label="標題" 
-                            value={editingTitle}
-                            onChange={(e) => setEditingTitle(e.target.value)}
-                            variant="outlined" 
-                        />
-                    </Box>
+                    <TextField 
+                        sx={sxs.titleField}
+                        label="頁面標題 (按空格鍵去下一行)"
+                        multiline
+                        value={editingTitle}
+                        onChange={(e) => setEditingTitle(e.target.value)}
+                        variant="outlined" 
+                    />
                     <Box sx={sxs.box}>
                         {previewButtonImage && (
                             <img src={previewButtonImage} alt="" style={sxs.img} />
@@ -188,6 +188,11 @@ const sxs = {
         pl: 3,
         pt: 3,
         alignItems: 'center'
+    },
+    titleField: {
+        pb: 2,
+        width: 400,
+        maxWidth: '100%'
     },
     box: {
         pb: 2,

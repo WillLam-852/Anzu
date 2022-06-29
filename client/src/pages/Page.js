@@ -46,7 +46,7 @@ const Page = () => {
             setEditMode(true)
         }
         setTitles(pages.titles)
-        setCurrentPage(pages.pages.find( element => element.title === path_title))
+        setCurrentPage(pages.pages.find( element => element.title.replace(/(\r\n|\n|\r)/gm, '') === path_title))
     }, [pages, location.pathname])
 
     useEffect(() => {
@@ -169,8 +169,9 @@ const Page = () => {
             return (
                 <Box>
                     <TextField 
-                        sx={sxs.box}
-                        label="頁面標題" 
+                        sx={sxs.titleField}
+                        label="頁面標題 (按空格鍵去下一行)"
+                        multiline
                         value={editingTitle}
                         onChange={(e) => setEditingTitle(e.target.value)}
                         variant="outlined" 
@@ -184,7 +185,7 @@ const Page = () => {
         } else {
             return (
                 <Stack sx={sxs.stack} spacing={2} direction="row">
-                    {currentPage && currentPage.title ? <Typography variant='h3'> {currentPage.title} </Typography> : null}
+                    {currentPage && currentPage.title ? <Typography variant='h3' sx={sxs.paragraph} component={'span'}> {currentPage.title.replace(/(\r\n|\n|\r)/gm, '\n ')} </Typography> : null}
                     {editMode ? <Button variant="outlined" onClick={handleEditTitleAction}> 更改頁面標題 </Button> : null}
                 </Stack>
             )
@@ -303,6 +304,15 @@ const sxs = {
     },
     box: {
         pb: 2
+    },
+    paragraph: {
+        pb: 2,
+        whiteSpace: 'pre-wrap'
+    },
+    titleField: {
+        pb: 2,
+        width: 400,
+        maxWidth: '100%'
     },
     stack: {
         alignItems: 'center'

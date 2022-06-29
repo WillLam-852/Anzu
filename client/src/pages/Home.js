@@ -159,7 +159,9 @@ const Home = () => {
                                                 pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
                                             }}
                                         >
-                                            {page.title}
+                                            {page.title.split("\n").map((i,key) => {
+                                                return <div key={key}>{i}</div>
+                                            })}
                                             <ImageMarked className="MuiImageMarked-root" />
                                         </Typography>
                                     </Image>

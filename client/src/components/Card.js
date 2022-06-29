@@ -181,9 +181,9 @@ const Card = ({ card_data, edit_mode=undefined }) => {
             {card && card.title ? <Typography sx={sxs.box} variant="h4"> {card.title} </Typography> : null}
             {card && card.image ? <img style={sxs.img} src={card.image} alt="" /> : null}
             {card && card.description?
-                <Typography sx={sxs.box} component={'span'}>
-                    {card.description.split("\n").map((i,key) => {
-                        return <div key={key}>{i}</div>
+                <Typography sx={sxs.paragraph} component={'span'} >
+                    {card.description.split("\n").map((line, key) => {
+                        return <div key={key}> {line} </div>
                     })}
                 </Typography>
             :
@@ -211,7 +211,11 @@ const sxs = {
         pb: 5
     },
     box: {
-        pb: 2
+        pb: 2,
+    },
+    paragraph: {
+        pb: 2,
+        whiteSpace: 'pre-wrap'
     },
     img: {
         maxWidth: '100%',

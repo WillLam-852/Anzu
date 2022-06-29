@@ -129,10 +129,10 @@ const Home = () => {
             <Box>
                 <ResponsiveAppBar titles={titles} edit_mode={editMode} />
                 <Box sx={sxs.container}>
-                    <Box sx={{ pb: 3 }}>
+                    <Box sx={sxs.section}>
                         <img src={home_banner} alt="Home Banner" width={"100%"} />
                     </Box>
-                    <Box>
+                    <Box sx={sxs.section}>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
                             {pages && pages.pages.map((page) => (
                                 <ImageButton
@@ -170,15 +170,15 @@ const Home = () => {
                             ))}
                         </Box>
                     </Box>
-                    <Box sx={{ pt: 2 }}>
-                        <Typography variant='h4'>Contact Us</Typography>
+                    <Box sx={sxs.section}>
+                        <Typography variant='h4'>ANZU</Typography>
                         <Typography paragraph component={'span'}>
                             {CONTACT_US_TEXT.split("\n").map((i,key) => {
                                 return <div key={key}>{i}</div>;
                             })}
                         </Typography>
                     </Box>
-                    <Box>
+                    <Box sx={sxs.section}>
                         <Stack spacing={4} direction={{ xs: 'column', sm: 'row' }} alignItems="flex-start">
                             <MapImage
                                 style={{
@@ -212,6 +212,7 @@ const sxs = {
             lg: 3,
             xl: 3
         },
+        pr: 1,
         width: {
             xs: '100%',
             sm: '100%',
@@ -219,6 +220,12 @@ const sxs = {
             lg: 900,
             xl: 900
         }
+    },
+    section: {
+        pb: 4
+    },
+    box: {
+        pb: 2
     },
     img: {
         maxWidth: '90%',

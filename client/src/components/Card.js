@@ -176,16 +176,17 @@ const Card = ({ card_data, edit_mode=undefined }) => {
         </Box>
     )
 
-    const show_normal_view = () => (
+    const show_normal_view = () => {
+        return (
         <Box sx={sxs.card}>
-            {card && card.title ? <Typography sx={sxs.box} variant="h4"> {card.title} </Typography> : null}
+            {card && card.title ? <Typography sx={sxs.box} variant="h4">{card.title}</Typography> : null}
             {card && card.image ? <img style={sxs.img} src={card.image} alt="" /> : null}
-            {card && card.description? <Typography sx={sxs.paragraph} component={'span'}> {card.description} </Typography> : null }
+            {card && card.description? <Typography sx={sxs.paragraph}>{card.description}</Typography> : null }
             <Box sx={sxs.box}>
                 {edit_mode ? <Button variant="outlined" onClick={handleEditAction}> {edit_mode} </Button> : null }
             </Box>
         </Box>
-    )
+    )}
     
     return (
         isDeleted ?

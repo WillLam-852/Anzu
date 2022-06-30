@@ -10,8 +10,6 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import ResponsiveAppBar from '../components/ResponsiveAppBar'
 import home_banner from '../images/home_banner.png'
-import map_1 from '../images/map_1.PNG'
-import map_2 from '../images/map_2.PNG'
 import { CONTACT_US_TEXT, ADMIN_PASSWORD } from '../constant/constants'
 
 
@@ -56,14 +54,6 @@ const Home = () => {
             },
         },
     }));
-
-    const MapImage = styled('span')(( { theme }) => ({
-        position: 'relative',
-        height: 350,
-        [theme.breakpoints.down('sm')]: {
-            width: '70% !important', // Overrides inline-style
-        },
-    }))
 
     const Image = styled('span')(({ theme }) => ({
         position: 'absolute',
@@ -179,22 +169,6 @@ const Home = () => {
                     </Box>
                     <Box sx={sxs.section}>
                         <Stack spacing={4} direction={{ xs: 'column', sm: 'row' }} alignItems="flex-start">
-                            {/* <MapImage
-                                style={{
-                                    width: '40%',
-                                    height: '100%'
-                                }}
-                            >
-                                <img src={map_1} alt="MAP 1" width="100%"/>
-                            </MapImage>
-                            <MapImage
-                                style={{
-                                    width: '35%',
-                                    height: '100%'
-                                }}
-                            >
-                                <img src={map_2} alt="MAP 2" width="100%"/>
-                            </MapImage>  */}
                             <iframe 
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3691.7605677452057!2d114.1491210154435!3d22.28705788533048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3404007dca18d291%3A0x8138ed7aac7eafa2!2sChampion%20Building%2C%20287-291%20Des%20Voeux%20Rd%20Central%2C%20Sheung%20Wan!5e0!3m2!1sen!2shk!4v1656524670425!5m2!1sen!2shk" 
                                 style={sxs.map}

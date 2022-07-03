@@ -185,7 +185,7 @@ const Page = () => {
         } else {
             return (
                 <Stack sx={sxs.stack} spacing={2} direction="row">
-                    {currentPage && currentPage.title ? <Typography variant='h3' sx={sxs.paragraph} component={'span'}> {currentPage.title.replace(/(\r\n|\n|\r)/gm, '\n ')} </Typography> : null}
+                    {currentPage && currentPage.title ? <Typography variant='h3' sx={sxs.paragraph} component={'span'}>{currentPage.title.replace(/(\r\n|\n|\r)/gm, '\n ')}</Typography> : null}
                     {editMode ? <Button variant="outlined" onClick={handleEditTitleAction}> 更改頁面標題 </Button> : null}
                 </Stack>
             )

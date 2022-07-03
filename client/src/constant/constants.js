@@ -5,4 +5,4 @@ export const CONTACT_US_TEXT = `1605 Champion Building
 email : anzuhk@yahoo.com
 WhatsApp to 44459808`
 
-export const ADMIN_PASSWORD = 'anzu_admin'
+export const ADMIN_PASSWORD = 'Apple07'

@@ -160,7 +160,7 @@ const Home = () => {
                         </Box>
                     </Box>
                     <Box sx={sxs.section}>
-                        <Typography variant='h4'>ANZU</Typography>
+                        <Typography variant='h4'>ANZU あんず</Typography>
                         <Typography paragraph component={'span'}>
                             {CONTACT_US_TEXT.split("\n").map((i,key) => {
                                 return <div key={key}>{i}</div>;

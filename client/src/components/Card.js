@@ -141,7 +141,8 @@ const Card = ({ card_data, edit_mode = undefined }) => {
       <Box sx={sxs.box}>
         <TextField
           sx={{ width: 400, maxWidth: "100%" }}
-          label="標題 (可留空)"
+          label="標題 (可留空，按Enter鍵去下一行)"
+          multiline
           value={editingTitle}
           onChange={(e) => setEditingTitle(e.target.value)}
           variant="outlined"
@@ -210,7 +211,7 @@ const Card = ({ card_data, edit_mode = undefined }) => {
     return (
       <Box sx={sxs.card}>
         {card && card.title ? (
-          <Typography sx={sxs.box} variant="h4">
+          <Typography sx={sxs.paragraph} variant="h4">
             {card.title}
           </Typography>
         ) : null}

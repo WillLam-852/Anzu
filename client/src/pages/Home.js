@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useLocation } from 'react-router-dom'
-import { logIn } from '../reducers/authReducer'
+import { ADMIN_PASSWORD, CONTACT_US_TEXT } from '../constant/constants'
+import React, { useEffect, useState } from 'react'
 import { Stack, Typography } from '@mui/material'
-import Box from '@mui/material/Box'
-import ButtonBase from '@mui/material/ButtonBase'
-import { styled } from '@mui/material/styles'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import ResponsiveAppBar from '../components/ResponsiveAppBar'
-import home_banner from '../images/home_banner.png'
-import { CONTACT_US_TEXT, ADMIN_PASSWORD } from '../constant/constants'
+import { useDispatch, useSelector } from 'react-redux'
 
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import ButtonBase from '@mui/material/ButtonBase'
+import Linkify from 'react-linkify'
+import ResponsiveAppBar from '../components/ResponsiveAppBar'
+import TextField from '@mui/material/TextField'
+import home_banner from '../images/home_banner.png'
+import { logIn } from '../reducers/authReducer'
+import { styled } from '@mui/material/styles'
+import { useLocation } from 'react-router-dom'
 
 const Home = () => {
     const [titles, setTitles] = useState([])
@@ -161,11 +162,7 @@ const Home = () => {
                     </Box>
                     <Box sx={sxs.section}>
                         <Typography variant='h4'>ANZU あんず</Typography>
-                        <Typography paragraph component={'span'}>
-                            {CONTACT_US_TEXT.split("\n").map((i,key) => {
-                                return <div key={key}>{i}</div>;
-                            })}
-                        </Typography>
+                        <Typography sx={sxs.paragraph}><Linkify>{CONTACT_US_TEXT}</Linkify></Typography>
                     </Box>
                     <Box sx={sxs.section}>
                         <Stack spacing={4} direction={{ xs: 'column', sm: 'row' }} alignItems="flex-start">
@@ -210,6 +207,9 @@ const sxs = {
     },
     box: {
         pb: 2
+    },
+    paragraph: {
+        whiteSpace: 'pre-wrap'
     },
     img: {
         maxWidth: '90%',

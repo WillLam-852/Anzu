@@ -1,5 +1,5 @@
-import { Alert, Stack, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { Stack, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -205,7 +205,7 @@ const Page = () => {
         <Stack sx={sxs.stack} spacing={2} direction="row">
           {currentPage && currentPage.title ? (
             <Typography variant="h3" sx={sxs.paragraph} component={"span"}>
-              {currentPage.title.replace(/(\r\n|\n|\r)/gm, "\n ")}
+              {currentPage.title.replace(/(\r\n|\n|\r)/gm, "\n")}
             </Typography>
           ) : null}
           {editMode ? (

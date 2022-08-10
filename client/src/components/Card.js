@@ -5,6 +5,7 @@ import AlertDialog from "./AlertDialog";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
+import Linkify from "react-linkify";
 import TextField from "@mui/material/TextField";
 import getSignedRequest from "../getSignedRequest";
 import http from "../http-common";
@@ -167,8 +168,7 @@ const Card = ({ card_data, edit_mode = undefined }) => {
             color="warning"
             onClick={remove_selected_image}
           >
-            {" "}
-            刪除照片{" "}
+            刪除照片
           </Button>
         ) : null}
       </Stack>
@@ -200,8 +200,7 @@ const Card = ({ card_data, edit_mode = undefined }) => {
       </Stack>
       {isLoading ? (
         <Box sx={sxs.box}>
-          {" "}
-          <CircularProgress />{" "}
+          <CircularProgress />
         </Box>
       ) : null}
     </Box>
@@ -219,13 +218,14 @@ const Card = ({ card_data, edit_mode = undefined }) => {
           <img style={sxs.img} src={card.image} alt="" />
         ) : null}
         {card && card.description ? (
-          <Typography sx={sxs.paragraph}>{card.description}</Typography>
+          <Typography sx={sxs.paragraph}>
+            <Linkify>{card.description}</Linkify>
+          </Typography>
         ) : null}
         <Box sx={sxs.box}>
           {edit_mode ? (
             <Button variant="outlined" onClick={handleEditAction}>
-              {" "}
-              {edit_mode}{" "}
+              {edit_mode}
             </Button>
           ) : null}
         </Box>

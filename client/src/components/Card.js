@@ -183,6 +183,7 @@ const Card = ({ card_data, edit_mode = undefined }) => {
           variant="outlined"
         />
       </Box>
+
       <Stack sx={sxs.box} spacing={2} direction="row">
         <Button variant="contained" onClick={handleConfirmAction}>
           確定
